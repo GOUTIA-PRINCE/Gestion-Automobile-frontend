@@ -15,7 +15,9 @@ export const routes: Routes = [
     {path:'carburant',component:CarburantComponent},
     {path:'maintenance',component:MaintenanceComponent},
     {path:'documents',component:DocumentsComponent},
-    {path:'alertes',component:AlertesComponent}
+    {path:'alertes',component:AlertesComponent},
+    // rediriger toutes les autres routes vers le tableau de bord
+    { path: '**', redirectTo: 'dashboard' }
     
 
    

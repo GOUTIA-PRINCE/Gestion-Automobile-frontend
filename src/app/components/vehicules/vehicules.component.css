@@ -1,8 +1,19 @@
 /* vehicules.component.css */
-.card {
-  transition: transform 0.15s ease;
+.vehicles-page {
+  width: 100%;
 }
 
-.card:hover {
-  transform: translateY(-2px);
+/* Ajustez le responsive grid pour mieux utiliser l'espace */
+@media (min-width: 1400px) {
+  .col-xl-3 {
+    flex: 0 0 auto;
+    width: 25%;
+  }
+}
+
+/* Pour les très grands écrans */
+@media (min-width: 1600px) {
+  .vehicles-page {
+    max-width: 1600px;
+  }
 }

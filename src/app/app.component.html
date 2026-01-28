@@ -1,14 +1,31 @@
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-auto px-0 d-none d-md-block">
-      <app-sidebar></app-sidebar>
+
+<div class="app-layout">
+  <!-- Sidebar pour desktop -->
+  <div class="sidebar-desktop d-none d-md-block">
+    <app-sidebar></app-sidebar>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="main-content">
+    <!-- Header fixe -->
+    <div class="main-header">
+      <app-header></app-header>
     </div>
 
-    <div class="col px-0">
-      <app-header></app-header>
-      <div class="p-4">
-        <router-outlet></router-outlet>
-      </div>
+    <!-- Zone de contenu défilante -->
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+
+  <!-- Offcanvas pour mobile -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">FleetPro</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <app-sidebar></app-sidebar>
     </div>
   </div>
 </div>

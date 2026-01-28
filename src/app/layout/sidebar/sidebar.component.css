@@ -15,3 +15,18 @@
   background-color: #fbbf24;
   color: #000;
 }
+
+/* sidebar.component.css */
+.sidebar {
+  width: 100%;
+  height: 100%;
+  background-color: #0f172a;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ajustez la hauteur pour le offcanvas mobile */
+.offcanvas-body .sidebar {
+  min-height: 100vh;
+}
