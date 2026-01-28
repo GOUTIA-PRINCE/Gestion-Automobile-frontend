@@ -43,8 +43,39 @@ export class VehiculesComponent {
       typeVehicule: 'Citadine',
       statut: 'en_panne',
       kilometrage: 98000
-    }
+    },
+    // {
+    //   id: 4,
+    //   immatriculation: 'IJ-789-KL',
+    //   marque: 'Range Rover',
+    //   modele: 'Clio',
+    //   annee: 2018,
+    //   typeVehicule: 'Citadine',
+    //   statut: 'en_panne',
+    //   kilometrage: 98000
+    // },
+    // {
+    //   id: 5,
+    //   immatriculation: 'IJ-789-KL',
+    //   marque: 'Suziki',
+    //   modele: 'Clio',
+    //   annee: 2018,
+    //   typeVehicule: 'Citadine',
+    //   statut: 'en_panne',
+    //   kilometrage: 98000
+    // },
+    // {
+    //   id: 6,
+    //   immatriculation: 'IJ-789-KL',
+    //   marque: 'Tesla',
+    //   modele: 'Clio',
+    //   annee: 2018,
+    //   typeVehicule: 'Citadine',
+    //   statut: 'en_panne',
+    //   kilometrage: 98000
+    // }
   ]);
+  
 
   isLoading = signal(false);
   canManage = true;

@@ -62,10 +62,26 @@
       class="col-12 col-md-6 col-xl-4"
       *ngFor="let v of filteredVehicles(); trackBy: trackByVehiculeId"
     >
-      <div class="card h-100">
+      <div class="card h-100 border-0 shadow-sm position-relative">
+    
+     <!-- Badge de statut positionné en haut à droite -->
+      <div class="position-absolute top-0 end-0 m-2">
+        <span
+          class="badge px-3 py-2"
+          [ngClass]="{
+            'bg-success': v.statut === 'actif',
+            'bg-warning': v.statut === 'en_maintenance',
+            'bg-danger': v.statut === 'en_panne',
+            'bg-secondary': v.statut === 'retire'
+          }"
+        >
+          {{ v.statut }}
+        </span>
+      </div>
 
-        <div class="card-body">
-          <h5 class="card-title">
+        <div class="card-body p-4">
+            <!-- Titre Principal -->
+          <h5 class="card-title fw-bold mb-3">
             {{ v.marque }} {{ v.modele }}
           </h5>
 
@@ -73,17 +89,6 @@
           <p class="mb-1"><strong>Année :</strong> {{ v.annee }}</p>
           <p class="mb-1"><strong>Kilométrage :</strong> {{ v.kilometrage }} km</p>
 
-          <span
-            class="badge"
-            [ngClass]="{
-              'bg-success': v.statut === 'actif',
-              'bg-warning': v.statut === 'en_maintenance',
-              'bg-danger': v.statut === 'en_panne',
-              'bg-secondary': v.statut === 'retire'
-            }"
-          >
-            {{ v.statut }}
-          </span>
         </div>
 
         <div class="card-footer bg-transparent text-end" *ngIf="canManage">
