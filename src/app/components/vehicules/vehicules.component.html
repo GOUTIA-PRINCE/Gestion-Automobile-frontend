@@ -1,1 +1,102 @@
-<p>vehicules works!</p>
+<div class="container-fluid">
+
+  <!-- HEADER -->
+  <div class="d-flex flex-column flex-md-row gap-3 justify-content-between align-items-md-center">
+
+    <div class="d-flex gap-2 flex-grow-1">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Rechercher un véhicule..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+      />
+
+      <button class="btn btn-outline-secondary">
+        <i class="bi bi-funnel"></i>
+      </button>
+    </div>
+
+    <button *ngIf="canManage" class="btn btn-primary" (click)="handleAdd()">
+      <i class="bi bi-plus"></i>
+      Ajouter un véhicule
+    </button>
+  </div>
+
+  <!-- STATS -->
+  <div class="row g-3 mt-3">
+    <div class="col-auto">
+      <div class="card p-2">
+        Total : <strong>{{ stats().total }}</strong>
+      </div>
+    </div>
+
+    <div class="col-auto">
+      <div class="card border-success text-success p-2">
+        Actifs : <strong>{{ stats().actifs }}</strong>
+      </div>
+    </div>
+
+    <div class="col-auto">
+      <div class="card border-warning text-warning p-2">
+        Maintenance : <strong>{{ stats().maintenance }}</strong>
+      </div>
+    </div>
+
+    <div class="col-auto">
+      <div class="card border-danger text-danger p-2">
+        En panne : <strong>{{ stats().enPanne }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADER -->
+  <div *ngIf="isLoading()" class="text-center my-5">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <!-- VEHICLES -->
+  <div *ngIf="!isLoading()" class="row g-4 mt-3">
+
+    <div
+      class="col-12 col-md-6 col-xl-4"
+      *ngFor="let v of filteredVehicles(); trackBy: trackByVehiculeId"
+    >
+      <div class="card h-100">
+
+        <div class="card-body">
+          <h5 class="card-title">
+            {{ v.marque }} {{ v.modele }}
+          </h5>
+
+          <p class="mb-1"><strong>Immat :</strong> {{ v.immatriculation }}</p>
+          <p class="mb-1"><strong>Année :</strong> {{ v.annee }}</p>
+          <p class="mb-1"><strong>Kilométrage :</strong> {{ v.kilometrage }} km</p>
+
+          <span
+            class="badge"
+            [ngClass]="{
+              'bg-success': v.statut === 'actif',
+              'bg-warning': v.statut === 'en_maintenance',
+              'bg-danger': v.statut === 'en_panne',
+              'bg-secondary': v.statut === 'retire'
+            }"
+          >
+            {{ v.statut }}
+          </span>
+        </div>
+
+        <div class="card-footer bg-transparent text-end" *ngIf="canManage">
+          <button
+            class="btn btn-sm btn-outline-primary"
+            (click)="handleEdit(v)"
+          >
+            Modifier
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
