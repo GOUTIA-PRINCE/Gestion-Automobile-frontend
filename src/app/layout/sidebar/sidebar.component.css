@@ -1,0 +1,17 @@
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background-color: #0f172a;
+  color: white;
+}
+
+.sidebar .nav-link {
+  color: #cbd5e1;
+  margin-bottom: 6px;
+}
+
+.sidebar .nav-link.active,
+.sidebar .nav-link:hover {
+  background-color: #fbbf24;
+  color: #000;
+}
