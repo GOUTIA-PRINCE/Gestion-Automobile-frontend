@@ -1,1 +1,384 @@
-<p>documents works!</p>
+<div class="documents-container">
+
+  <!-- HEADER -->
+  <div class="d-flex flex-column flex-md-row gap-3 justify-content-between align-items-md-center mb-4">
+    <div>
+      <h2 class="mb-0 fw-bold">Documents</h2>
+      <p class="text-muted mb-0">Gestion des documents administratifs</p>
+    </div>
+
+    <!-- barre de recherche -->
+    <div class="d-flex gap-4">
+      <div class="input-group" style="max-width: 200px;">
+        <span class="input-group-text bg-white border-end-0">
+          <i class="bi bi-search text-muted"></i>
+        </span>
+        <input
+          type="text"
+          class="form-control border-start-0"
+          placeholder="Rechercher un document..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+        />
+      </div>
+        <!--bouton pour filtrer les rechercher en fonctions des criteres -->
+        <button class="btn btn-outline-secondary">
+        <i class="bi bi-funnel"></i>
+       </button>
+
+      <button class="btn btn-primary d-flex align-items-center gap-2" (click)="handleUpload()">
+        <i class="bi bi-upload"></i>
+        <span class="d-none d-md-inline">Ajouter un document</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- STATISTIQUES -->
+  <div class="row g-4 mb-4">
+    <!-- Total documents -->
+    <div class="col-6 col-md-4 col-lg">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4 text-center">
+          <div class="text-muted small mb-1">Total documents</div>
+          <div class="h2 fw-bold text-primary">{{ stats().total }}</div>
+          <div class="small text-muted">{{ formatTaille(stats().tailleTotale) }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documents valides -->
+    <div class="col-6 col-md-4 col-lg">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4 text-center">
+          <div class="text-muted small mb-1">Valides</div>
+          <div class="h2 fw-bold text-success">{{ stats().valides }}</div>
+          <div class="small text-success">{{ (stats().valides / stats().total * 100).toFixed(0) }}%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expirent bientôt -->
+    <div class="col-6 col-md-4 col-lg">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4 text-center">
+          <div class="text-muted small mb-1">Expirent bientôt</div>
+          <div class="h2 fw-bold text-warning">{{ stats().expirant }}</div>
+          <div class="small text-warning">À vérifier</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expirés -->
+    <div class="col-6 col-md-4 col-lg">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4 text-center">
+          <div class="text-muted small mb-1">Expirés</div>
+          <div class="h2 fw-bold text-danger">{{ stats().expires }}</div>
+          <div class="small text-danger">À renouveler</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTRES -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <div class="row g-3">
+        <div class="col-12 col-md-6 col-lg-3">
+          <label class="form-label small text-muted mb-1">Type de document</label>
+          <select 
+            class="form-select" 
+            [ngModel]="filtreType()"
+            (ngModelChange)="filtreType.set($event)"
+          >
+            <option value="tous">Tous les types</option>
+            @for (type of typesOptions(); track type) {
+              @if (type !== 'tous') {
+                <option [value]="type">{{ getTypeLabel(type) }}</option>
+              }
+            }
+          </select>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <label class="form-label small text-muted mb-1">Catégorie</label>
+          <select 
+            class="form-select" 
+            [ngModel]="filtreCategorie()"
+            (ngModelChange)="filtreCategorie.set($event)"
+          >
+            <option value="tous">Toutes les catégories</option>
+            @for (categorie of categoriesOptions(); track categorie) {
+              @if (categorie !== 'tous') {
+                <option [value]="categorie">{{ getCategorieLabel(categorie) }}</option>
+              }
+            }
+          </select>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+          <label class="form-label small text-muted mb-1">Statut</label>
+          <select class="form-select">
+            <option>Tous les statuts</option>
+            <option>Valides uniquement</option>
+            <option>Expirés/expirant</option>
+          </select>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3 d-flex align-items-end">
+          <button class="btn btn-outline-secondary w-100" (click)="filtreType.set('tous'); filtreCategorie.set('tous'); searchQuery.set('')">
+            <i class="bi bi-arrow-clockwise me-2"></i>
+            Réinitialiser
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENU PRINCIPAL -->
+  <div class="row g-4">
+    <!-- LISTE DES DOCUMENTS -->
+    <div class="col-12 col-lg-8">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0 py-3 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold">Documents</h5>
+          <span class="badge bg-primary">{{ filteredDocuments().length }} document(s)</span>
+        </div>
+
+        <div class="card-body p-0">
+          <!-- Message si aucun document -->
+          @if (filteredDocuments().length === 0) {
+            <div class="text-center py-5">
+              <i class="bi bi-folder text-muted" style="font-size: 3rem;"></i>
+              <h4 class="mt-3 text-muted">Aucun document trouvé</h4>
+              <p>Ajoutez votre premier document ou modifiez vos critères de recherche</p>
+            </div>
+          }
+
+          <!-- Liste des documents -->
+          <div class="list-group list-group-flush">
+            @for (doc of filteredDocuments(); track doc.id) {
+              <div class="list-group-item border-0 px-4 py-3">
+                <div class="d-flex gap-3">
+                  <!-- Icône type -->
+                  <div class="flex-shrink-0">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center p-3">
+                      <i class="bi {{ getExtensionIcon(doc.extension) }} text-primary" style="font-size: 1.5rem;"></i>
+                    </div>
+                  </div>
+
+                  <!-- Contenu -->
+                  <div class="flex-grow-1">
+                    <!-- En-tête -->
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div>
+                        <h6 class="fw-bold mb-1">{{ doc.titre }}</h6>
+                        <div class="text-muted small">
+                          @if (doc.vehiculeImmatriculation) {
+                            <span class="me-2">
+                              <i class="bi bi-car-front me-1"></i>
+                              {{ doc.vehiculeMarque }} {{ doc.vehiculeModele }} • {{ doc.vehiculeImmatriculation }}
+                            </span>
+                          }
+                          @if (doc.chauffeurNom) {
+                            <span>
+                              <i class="bi bi-person me-1"></i>
+                              {{ doc.chauffeurNom }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+                      <div class="d-flex gap-2">
+                        <span class="badge {{ getStatutClass(doc.statut) }}">
+                          {{ getStatutLabel(doc.statut) }}
+                        </span>
+                        <span class="badge bg-light text-dark">
+                          <i class="bi {{ getTypeIcon(doc.type) }} me-1"></i>
+                          {{ getTypeLabel(doc.type) }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Description -->
+                    @if (doc.description) {
+                      <p class="mb-3">{{ doc.description }}</p>
+                    }
+
+                    <!-- Métadonnées -->
+                    <div class="row g-3">
+                      <div class="col-6 col-md-3">
+                        <div class="d-flex align-items-center gap-2">
+                          <i class="bi bi-calendar3 text-primary"></i>
+                          <div>
+                            <div class="small text-muted">Créé le</div>
+                            <div class="fw-medium">{{ formatDate(doc.dateCreation) }}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      @if (doc.dateExpiration) {
+                        <div class="col-6 col-md-3">
+                          <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-clock text-primary"></i>
+                            <div>
+                              <div class="small text-muted">Expire le</div>
+                              <div class="fw-medium">
+                                {{ formatDate(doc.dateExpiration) }}
+                                @if (getJoursRestants(doc.dateExpiration) !== null) {
+                                  @if (getJoursRestants(doc.dateExpiration)! <= 0) {
+                                    <span class="badge ms-2 bg-danger">
+                                      Expiré
+                                    </span>
+                                  } @else if (getJoursRestants(doc.dateExpiration)! <= 30) {
+                                    <span class="badge ms-2 bg-warning">
+                                      {{ getJoursRestants(doc.dateExpiration) }} j
+                                    </span>
+                                  }
+                                }
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      }
+
+                      <div class="col-6 col-md-3">
+                        <div class="d-flex align-items-center gap-2">
+                          <i class="bi bi-hdd text-primary"></i>
+                          <div>
+                            <div class="small text-muted">Taille</div>
+                            <div class="fw-medium">{{ formatTaille(doc.taille) }}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-6 col-md-3">
+                        <div class="d-flex align-items-center gap-2">
+                          <i class="bi bi-folder text-primary"></i>
+                          <div>
+                            <div class="small text-muted">Catégorie</div>
+                            <div class="fw-medium">
+                              <i class="bi {{ getCategorieIcon(doc.categorie) }} me-1"></i>
+                              {{ getCategorieLabel(doc.categorie) }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Tags -->
+                    @if (doc.tags && doc.tags.length > 0) {
+                      <div class="mt-3">
+                        <div class="d-flex flex-wrap gap-2">
+                          @for (tag of doc.tags; track tag) {
+                            <span class="badge bg-light text-dark border">{{ tag }}</span>
+                          }
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Actions -->
+                    <div class="d-flex gap-2 mt-3">
+                      <button class="btn btn-sm btn-outline-primary" (click)="handleView(doc)">
+                        <i class="bi bi-eye me-1"></i>
+                        Visualiser
+                      </button>
+                      <button class="btn btn-sm btn-outline-success" (click)="handleDownload(doc)">
+                        <i class="bi bi-download me-1"></i>
+                        Télécharger
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger" (click)="handleDelete(doc.id)">
+                        <i class="bi bi-trash me-1"></i>
+                        Supprimer
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL LATÉRAL -->
+    <div class="col-12 col-lg-4">
+      <!-- Catégories -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent border-0 py-3">
+          <h6 class="mb-0 fw-bold">Par catégorie</h6>
+        </div>
+        <div class="card-body pt-0">
+          <div class="list-group list-group-flush">
+            @for (item of documentsParCategorie(); track item.categorie) {
+              <div class="list-group-item border-0 px-0 py-2">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bi {{ getCategorieIcon(item.categorie) }} text-primary"></i>
+                    <span>{{ getCategorieLabel(item.categorie) }}</span>
+                  </div>
+                  <span class="badge bg-primary-subtle text-primary">
+                    {{ item.count }}
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents expirant -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0 py-3">
+          <h6 class="mb-0 fw-bold">Documents à renouveler</h6>
+        </div>
+        <div class="card-body pt-0">
+          <div class="list-group list-group-flush">
+            @for (doc of documentsExpirants(); track doc.id) {
+              <div class="list-group-item border-0 px-0 py-3">
+                <div class="d-flex align-items-start gap-2">
+                  <div class="rounded-circle bg-warning-subtle d-flex align-items-center justify-content-center p-2">
+                    <i class="bi bi-exclamation-triangle text-warning"></i>
+                  </div>
+                  <div>
+                    <div class="fw-medium">{{ doc.titre }}</div>
+                    @if (doc.dateExpiration) {
+                      <div class="small text-danger">
+                        Expire le {{ formatDate(doc.dateExpiration) }}
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL UPLOAD -->
+  @if (isUploadOpen()) {
+    <div class="modal fade show d-block" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Ajouter un document</h5>
+            <button type="button" class="btn-close" (click)="isUploadOpen.set(false)"></button>
+          </div>
+          <div class="modal-body">
+            <p>Formulaire d'upload de document ici...</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="isUploadOpen.set(false)">
+              Annuler
+            </button>
+            <button type="button" class="btn btn-primary">
+              Enregistrer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+  }
+</div>
