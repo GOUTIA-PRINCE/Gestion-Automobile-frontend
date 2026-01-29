@@ -1,0 +1,88 @@
+.carburant-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table th {
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.progress {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  border-radius: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .carburant-container {
+    padding: 0 0.5rem;
+  }
+  
+  .card-body {
+    padding: 1rem !important;
+  }
+  
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+  
+  .table th, .table td {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
+/* Dark mode support */
+[data-bs-theme="dark"] .table-light {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+[data-bs-theme="dark"] .progress {
+  background-color: #444;
+}
+
+/* Animation pour les cartes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Style pour les badges de véhicules */
+.badge.bg-primary-subtle {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
