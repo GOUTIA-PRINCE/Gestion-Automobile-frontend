@@ -1,1 +1,256 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+
+  <!-- En-tête -->
+  <div class="mb-4">
+    <h2 class="fw-bold mb-2">Tableau de bord</h2>
+    <p class="text-muted mb-0">Vue d'ensemble de votre parc automobile</p>
+  </div>
+
+  <!-- STATISTIQUES -->
+  <div class="row g-4 mb-4">
+    <!-- Total véhicules -->
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted small mb-1">Total véhicules</div>
+              <div class="h2 fw-bold text-primary">{{ stats().totalVehicules }}</div>
+              <div class="small text-success">{{ stats().vehiculesActifs }} actifs</div>
+            </div>
+            <div class="rounded-circle bg-primary-subtle p-3">
+              <i class="bi bi-car-front text-primary fs-4"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Consommation mensuelle -->
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted small mb-1">Consommation mensuelle</div>
+              <div class="h2 fw-bold text-success">{{ stats().consommationMensuelle }} L</div>
+              <div class="small d-flex align-items-center gap-1" [ngClass]="getPourcentageClass(evolutionPourcentage())">
+                <i class="bi" [ngClass]="getPourcentageIcon(evolutionPourcentage())"></i>
+                <span>{{ evolutionPourcentage() > 0 ? '+' : '' }}{{ evolutionPourcentage().toFixed(1) }}% Ce mois</span>
+              </div>
+            </div>
+            <div class="rounded-circle bg-success-subtle p-3">
+              <i class="bi bi-fuel-pump text-success fs-4"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coût maintenance -->
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted small mb-1">Coût maintenance</div>
+              <div class="h2 fw-bold text-warning">{{ formatCurrency(stats().coutMaintenance) }}</div>
+              <div class="small text-muted">Ce mois</div>
+            </div>
+            <div class="rounded-circle bg-warning-subtle p-3">
+              <i class="bi bi-tools text-warning fs-4"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertes en cours -->
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted small mb-1">Alertes en cours</div>
+              <div class="h2 fw-bold text-danger">{{ stats().alertesEnCours }}</div>
+              <div class="small text-danger">{{ stats().vehiculesEnPanne }} véhicule(s) en panne</div>
+            </div>
+            <div class="rounded-circle bg-danger-subtle p-3">
+              <i class="bi bi-exclamation-triangle text-danger fs-4"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRAPHIQUE ET ÉTAT DU PARC -->
+  <div class="row g-4 mb-4">
+    <!-- Graphique consommation -->
+    <div class="col-12 col-lg-8">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center py-3">
+          <h5 class="mb-0 fw-bold">Consommation carburant mensuelle</h5>
+          <select class="form-select form-select-sm" style="width: auto;">
+            <option>6 derniers mois</option>
+            <option>12 derniers mois</option>
+            <option>Année en cours</option>
+          </select>
+        </div>
+        <div class="card-body pt-0">
+          <div style="height: 300px;">
+            <canvas id="consommationChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- État du parc -->
+    <div class="col-12 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0 py-3">
+          <h5 class="mb-0 fw-bold">État du parc</h5>
+        </div>
+        <div class="card-body pt-0">
+          <table class="table table-sm mb-0">
+            <thead>
+              <tr>
+                <th>Catégorie</th>
+                <th class="text-end">Valeur</th>
+                <th class="text-end">(%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Actifs</td>
+                <td class="text-end fw-medium">{{ statsEtat().actifs }}</td>
+                <td class="text-end">{{ (statsEtat().actifs / stats().totalVehicules * 100).toFixed(0) }}%</td>
+              </tr>
+              <tr>
+                <td>En panne</td>
+                <td class="text-end fw-medium">{{ statsEtat().enPanne }}</td>
+                <td class="text-end">{{ (statsEtat().enPanne / stats().totalVehicules * 100).toFixed(0) }}%</td>
+              </tr>
+              <tr>
+                <td>Maintenance</td>
+                <td class="text-end fw-medium">{{ statsEtat().maintenance }}</td>
+                <td class="text-end">{{ (statsEtat().maintenance / stats().totalVehicules * 100).toFixed(0) }}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VÉHICULES ET ALERTES -->
+  <div class="row g-4 mb-4">
+    <!-- Véhicules du parc -->
+    <div class="col-12 col-lg-8">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0 py-3 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold">Véhicules du parc</h5>
+          <a routerLink="/vehicules" class="btn btn-sm btn-outline-primary">Voir tout</a>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-4">Véhicule</th>
+                  <th>Immatriculation</th>
+                  <th>Chauffeur</th>
+                  <th>Kilométrage</th>
+                  <th class="text-end pe-4">État</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let v of vehiculesRecents()">
+                  <td class="ps-4 fw-medium">
+                    {{ v.marque }} {{ v.modele }} • {{ v.annee }}
+                  </td>
+                  <td>{{ v.immatriculation }}</td>
+                  <td>{{ v.chauffeur }}</td>
+                  <td>{{ v.kilometrage.toLocaleString('fr-FR') }} km</td>
+                  <td class="text-end pe-4">
+                    <span [ngClass]="getStatutClass(v.statut)">{{ getStatutLabel(v.statut) }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertes récentes -->
+    <div class="col-12 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0 py-3 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold">Alertes récentes</h5>
+          <a routerLink="/alertes" class="btn btn-sm btn-outline-primary">Voir tout</a>
+        </div>
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush">
+            <div *ngFor="let alerte of alertesRecentes()" class="list-group-item border-0 px-4 py-3">
+              <div class="d-flex gap-3">
+                <div class="flex-shrink-0">
+                  <div class="rounded-circle border p-2" [ngClass]="getPrioriteClass(alerte.priorite)">
+                    <i class="bi" [ngClass]="getPrioriteIcon(alerte.priorite)"></i>
+                  </div>
+                </div>
+                <div class="flex-grow-1">
+                  <div class="fw-medium mb-1">{{ alerte.titre }}</div>
+                  <div class="text-muted small mb-1">
+                    {{ alerte.vehicule }} • {{ alerte.immatriculation }}
+                  </div>
+                  <div class="small">{{ formatDate(alerte.date) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENTRETIENS À VENIR -->
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0 py-3 d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold">Entretiens à venir</h5>
+          <a routerLink="/maintenance" class="btn btn-sm btn-outline-primary">Voir tout</a>
+        </div>
+        <div class="card-body p-0">
+          <div class="row g-0">
+            <div *ngFor="let entretien of entretiensResumes(); let first = first" class="col-12 col-md-6">
+              <div class="p-4 h-100" [ngClass]="{'border-end border-bottom': first, 'border-bottom': !first}">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h6 class="fw-bold mb-0">{{ entretien.titre }}</h6>
+                  <span class="badge" [ngClass]="{
+                    'bg-warning': entretien.statut === 'planifie',
+                    'bg-info': entretien.statut === 'en_cours',
+                    'bg-success': entretien.statut === 'termine'
+                  }">
+                    {{ entretien.statut === 'planifie' ? 'Planifié' : 
+                       entretien.statut === 'en_cours' ? 'En cours' : 
+                       'Terminé' }}
+                  </span>
+                </div>
+                <p class="text-muted small mb-2">
+                  {{ entretien.vehicule }} • {{ entretien.immatriculation }}
+                </p>
+                <p class="mb-3">{{ entretien.description }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="fw-medium">{{ formatDate(entretien.date) }}</span>
+                  <span class="fw-bold text-success">{{ formatCurrency(entretien.cout) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,92 @@
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table th {
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.list-group-item {
+  transition: background-color 0.15s ease;
+}
+
+.list-group-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.badge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Animation des cartes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 0 0.5rem;
+  }
+  
+  .card-body {
+    padding: 1rem !important;
+  }
+  
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+  
+  .table th, .table td {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .list-group-item {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
+/* Dark mode support */
+[data-bs-theme="dark"] .table-light {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+}
+
+[data-bs-theme="dark"] .table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+[data-bs-theme="dark"] .list-group-item:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
