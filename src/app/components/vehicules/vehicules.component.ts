@@ -73,16 +73,6 @@ export class VehiculesComponent {
       typeVehicule: 'Citadine',
       statut: 'en_panne',
       kilometrage: 98000
-    },
-    {
-      id: 7,
-      immatriculation: 'IJ-789-KL',
-      marque: 'Lamburghini',
-      modele: 'Clio',
-      annee: 2018,
-      typeVehicule: 'Citadine',
-      statut: 'en_panne',
-      kilometrage: 98000
     }
   ]);
   
