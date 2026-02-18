@@ -1,5 +1,5 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, signal, computed, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DashboardService } from '../../services/dashboard.service';
 import { Chart, registerables } from 'chart.js';
@@ -13,6 +13,7 @@ import { Chart, registerables } from 'chart.js';
 export class DashboardComponent implements OnInit {
 
   private dashboardService = inject(DashboardService);
+  private platformId = inject(PLATFORM_ID);
 
   // Signals
   stats = this.dashboardService.stats;
@@ -51,6 +52,10 @@ export class DashboardComponent implements OnInit {
   }
 
   initChart() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return; // N'exécute le code que côté client
+    }
+
     const canvas = document.getElementById('consommationChart') as HTMLCanvasElement;
     if (!canvas) return;
 
