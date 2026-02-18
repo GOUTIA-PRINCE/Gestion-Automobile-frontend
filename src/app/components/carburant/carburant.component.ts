@@ -1,8 +1,8 @@
-import { Component,signal, computed, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, signal, computed, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CarburantService } from '../../services/carburant.service';
- import { Chart, registerables } from 'chart.js';
+import { Chart, registerables } from 'chart.js';
 
 @Component({
   selector: 'app-carburant',
@@ -12,6 +12,7 @@ import { CarburantService } from '../../services/carburant.service';
 })
 export class CarburantComponent implements OnInit {
   private carburantService = inject(CarburantService);
+  private platformId = inject(PLATFORM_ID);
 
   // Signals
   pleins = this.carburantService.pleins;
@@ -38,6 +39,10 @@ export class CarburantComponent implements OnInit {
   }
 
   initChart() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return; // N'exécute le code que côté client
+    }
+
     const canvas = document.getElementById('evolutionChart') as HTMLCanvasElement;
     if (!canvas) return;
 

@@ -1,0 +1,11 @@
+{
+  "routes": {
+    "/fleetpro/alertes": {},
+    "/fleetpro/carburant": {},
+    "/fleetpro/chauffeurs": {},
+    "/fleetpro/dashboard": {},
+    "/fleetpro/documents": {},
+    "/fleetpro/maintenance": {},
+    "/fleetpro/vehicules": {}
+  }
+}
