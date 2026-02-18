@@ -18,8 +18,5 @@ export const routes: Routes = [
     {path:'alertes',component:AlertesComponent},
     // rediriger toutes les autres routes vers le tableau de bord
     { path: '**', redirectTo: 'dashboard' }
-    
-
-   
-    
+      
 ];
