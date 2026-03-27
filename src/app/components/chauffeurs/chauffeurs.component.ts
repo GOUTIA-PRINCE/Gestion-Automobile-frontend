@@ -34,7 +34,7 @@ export class ChauffeursComponent implements OnInit {
   selectedChauffeur = signal<Chauffeur | null>(null);
   canManage = true;
 
-  formData: Partial<Chauffeur> & { vehiculeAttribue: { marque: string; modele: string; immatriculation: string } } = this.createEmptyForm();
+  formData: Partial<Chauffeur> & { vehiculeAttribue: { id?: number; marque: string; modele: string; immatriculation: string } } = this.createEmptyForm();
 
   ngOnInit(): void {
     this.isLoading.set(true);
@@ -69,9 +69,15 @@ export class ChauffeursComponent implements OnInit {
 
   handleEdit(chauffeur: Chauffeur): void {
     this.selectedChauffeur.set(chauffeur);
+    const selectedVehicule = chauffeur.vehiculeAttribue?.id
+      ? this.vehicules().find(v => v.id === chauffeur.vehiculeAttribue?.id)
+      : this.vehicules().find(v => v.immatriculation === chauffeur.vehiculeAttribue?.immatriculation);
+
     this.formData = {
       ...chauffeur,
-      vehiculeAttribue: chauffeur.vehiculeAttribue ? { ...chauffeur.vehiculeAttribue } : { marque: '', modele: '', immatriculation: '' }
+      vehiculeAttribue: selectedVehicule
+        ? { id: selectedVehicule.id, marque: selectedVehicule.marque, modele: selectedVehicule.modele, immatriculation: selectedVehicule.immatriculation }
+        : chauffeur.vehiculeAttribue ? { ...chauffeur.vehiculeAttribue } : { id: undefined, marque: '', modele: '', immatriculation: '' }
     };
     this.isFormOpen.set(true);
   }
@@ -83,7 +89,9 @@ export class ChauffeursComponent implements OnInit {
   }
 
   handleSubmit(): void {
-    const payload: Omit<Chauffeur, 'id'> = {
+    const selectedVehicule = this.vehicules().find(v => v.id === this.formData.vehiculeAttribue?.id);
+
+    const payload: Omit<Chauffeur, 'id'> & { vehiculeId?: number } = {
       nom: this.formData.nom?.trim() || '',
       prenom: this.formData.prenom?.trim() || '',
       telephone: this.formData.telephone || '',
@@ -95,13 +103,15 @@ export class ChauffeursComponent implements OnInit {
       dateNaissance: this.formData.dateNaissance || '',
       adresse: this.formData.adresse || '',
       experience: this.formData.experience ?? 0,
-      vehiculeAttribue: this.formData.vehiculeAttribue?.marque || this.formData.vehiculeAttribue?.modele || this.formData.vehiculeAttribue?.immatriculation
+      vehiculeAttribue: selectedVehicule
         ? {
-            marque: this.formData.vehiculeAttribue?.marque || '',
-            modele: this.formData.vehiculeAttribue?.modele || '',
-            immatriculation: this.formData.vehiculeAttribue?.immatriculation || ''
+            id: selectedVehicule.id,
+            marque: selectedVehicule.marque,
+            modele: selectedVehicule.modele,
+            immatriculation: selectedVehicule.immatriculation
           }
-        : undefined
+        : undefined,
+      vehiculeId: selectedVehicule?.id
     };
 
     if (this.selectedChauffeur()) {
@@ -114,16 +124,17 @@ export class ChauffeursComponent implements OnInit {
     this.closeForm();
   }
 
-  onVehiculeSelect(immatriculation: string): void {
-    const selected = this.availableVehicules().find((v: Vehicules) => v.immatriculation === immatriculation);
+  onVehiculeSelect(id?: number): void {
+    const selected = this.vehicules().find((v: Vehicules) => v.id === id);
     if (selected) {
       this.formData.vehiculeAttribue = {
+        id: selected.id,
         marque: selected.marque,
         modele: selected.modele,
         immatriculation: selected.immatriculation
       };
     } else {
-      this.formData.vehiculeAttribue = { marque: '', modele: '', immatriculation: '' };
+      this.formData.vehiculeAttribue = { id: undefined, marque: '', modele: '', immatriculation: '' };
     }
   }
 

@@ -59,7 +59,7 @@ export class ChauffeurService {
 
   // crud operations
 
-  addChauffeur(chauffeur: Omit<Chauffeur, 'id'>) {
+  addChauffeur(chauffeur: Omit<Chauffeur, 'id'> & { vehiculeId?: number }) {
     return this.http.post<Chauffeur>(this.apiUrl, chauffeur).subscribe(newCh => {
       this.chauffeurs.update(list => [...list, newCh]);
     });

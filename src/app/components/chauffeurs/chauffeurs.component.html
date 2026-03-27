@@ -392,13 +392,13 @@
                     <select
                       name="vehiculeAttribue"
                       class="form-select"
-                      [(ngModel)]="formData.vehiculeAttribue.immatriculation"
+                      [(ngModel)]="formData.vehiculeAttribue.id"
                       (ngModelChange)="onVehiculeSelect($event)"
                     >
-                      <option value="">Aucun véhicule</option>
+                      <option [ngValue]="undefined">Aucun véhicule</option>
                       <option
                         *ngFor="let v of availableVehicules()"
-                        [value]="v.immatriculation"
+                        [ngValue]="v.id"
                       >
                         {{ v.marque }} {{ v.modele }} - {{ v.immatriculation }} ({{ formatVehiculeStatut(v.statut) }})
                       </option>

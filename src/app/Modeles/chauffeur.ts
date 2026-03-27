@@ -8,6 +8,7 @@ export interface Chauffeur {
   dateEmbauche: string;
   statut: 'actif' | 'inactif' | 'congé' | 'mission';
   vehiculeAttribue?: {
+    id?: number;
     marque: string;
     modele: string;
     immatriculation: string;
