@@ -1,38 +1,49 @@
 import { CommonModule } from '@angular/common';
-import { Component,signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Chauffeur } from '../../Modeles/chauffeur';
 import { ChauffeurService } from '../../services/chauffeur.service';
 
 @Component({
   selector: 'app-chauffeurs',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './chauffeurs.component.html',
-  styleUrl: './chauffeurs.component.css'
+  styleUrls: ['./chauffeurs.component.css']
 })
-export class ChauffeursComponent {
+export class ChauffeursComponent implements OnInit {
 
+  // Services
   private chauffeurService = inject(ChauffeurService);
 
-  // Signals
+  // Signals partagés avec le service
   chauffeurs = this.chauffeurService.chauffeurs;
   searchQuery = this.chauffeurService.searchQuery;
+  filteredChauffeurs = this.chauffeurService.filteredChauffeurs;
+  stats = this.chauffeurService.stats;
+
+  // États locaux
   isLoading = signal(false);
-  canManage = true;
   isFormOpen = signal(false);
   selectedChauffeur = signal<Chauffeur | null>(null);
+  canManage = true;
 
-  // Computed
-  filteredChauffeurs = computed(() => this.chauffeurService.getFilteredChauffeurs());
-  stats = computed(() => ({
-    total: this.chauffeurs().length,
-    actifs: this.chauffeurs().filter(c => c.statut === 'actif').length,
-    mission: this.chauffeurs().filter(c => c.statut === 'mission').length,
-    conge: this.chauffeurs().filter(c => c.statut === 'congé').length,
-    inactifs: this.chauffeurs().filter(c => c.statut === 'inactif').length
-  }));
+  ngOnInit(): void {
+    this.isLoading.set(true);
+    this.chauffeurService.getChauffeurs().subscribe({
+      next: data => {
+        this.chauffeurs.set(data);
+        console.log('Chauffeurs récupérés :', data);
+        this.isLoading.set(false);
+      },
+      error: err => {
+        console.error('Erreur API', err);
+        this.isLoading.set(false);
+      }
+    });
+  }
 
-  // Actions
+  // ACTIONS
   handleAdd(): void {
     this.selectedChauffeur.set(null);
     this.isFormOpen.set(true);
@@ -49,22 +60,17 @@ export class ChauffeursComponent {
     }
   }
 
-  // TrackBy
+  // TRACK BY
   trackByChauffeurId(index: number, chauffeur: Chauffeur): number {
     return chauffeur.id;
   }
 
-  // Helper pour obtenir les initiales
+  // HELPER
   getInitials(nom: string, prenom: string): string {
     return `${prenom.charAt(0)}${nom.charAt(0)}`.toUpperCase();
   }
 
-  // Formatter la date
-  formatDate(dateStr: string): string {
-    const [day, month, year] = dateStr.split('/');
-    const months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 
-                   'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-    return `${day} ${months[parseInt(month) - 1]} ${year}`;
+  formatDate(date: string): string {
+    return date; // ou formatter selon ton besoin
   }
-
 }

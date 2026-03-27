@@ -1,119 +1,87 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { Chauffeur } from '../Modeles/chauffeur';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChauffeurService {
 
-  private chauffeursData: Chauffeur[] = [
-    {
-      id: 1,
-      nom: 'Nguema',
-      prenom: 'Jean-Pierre',
-      telephone: '+237 699 123 456',
-      email: 'jp.nguema@company.cm',
-      numeroPermis: 'B-2019-45678',
-      dateEmbauche: '01/03/2019',
-      statut: 'actif',
-      vehiculeAttribue: {
-        marque: 'Toyota',
-        modele: 'Hilux',
-        immatriculation: 'LT 1234 A'
-      },
-      photoUrl: 'https://randomuser.me/api/portraits/men/32.jpg',
-      dateNaissance: '15/08/1985',
-      adresse: 'Yaoundé, Cameroun',
-      experience: 5
-    },
-    {
-      id: 2,
-      nom: 'Fotso',
-      prenom: 'Marie',
-      telephone: '+237 677 234 567',
-      email: 'm.fotso@company.cm',
-      numeroPermis: 'B-2018-34567',
-      dateEmbauche: '15/06/2018',
-      statut: 'actif',
-      vehiculeAttribue: {
-        marque: 'Mitsubishi',
-        modele: 'L200',
-        immatriculation: 'CE 5678 B'
-      },
-      photoUrl: 'https://randomuser.me/api/portraits/women/44.jpg',
-      dateNaissance: '22/11/1990',
-      adresse: 'Douala, Cameroun',
-      experience: 6
-    },
-    {
-      id: 3,
-      nom: 'Mbappe',
-      prenom: 'Samuel',
-      telephone: '+237 655 345 678',
-      email: 's.mbappe@company.cm',
-      numeroPermis: 'B-2020-56789',
-      dateEmbauche: '10/01/2020',
-      statut: 'mission',
-      vehiculeAttribue: {
-        marque: 'Ford',
-        modele: 'Ranger',
-        immatriculation: 'LT 9012 C'
-      },
-      photoUrl: 'https://randomuser.me/api/portraits/men/22.jpg',
-      dateNaissance: '30/03/1988',
-      adresse: 'Bafoussam, Cameroun',
-      experience: 4
-    },
-    {
-      id: 4,
-      nom: 'Kouam',
-      prenom: 'Amina',
-      telephone: '+237 699 987 654',
-      email: 'a.kouam@company.cm',
-      numeroPermis: 'B-2021-67890',
-      dateEmbauche: '20/09/2021',
-      statut: 'congé',
-      photoUrl: 'https://randomuser.me/api/portraits/women/33.jpg',
-      dateNaissance: '12/07/1993',
-      adresse: 'Garoua, Cameroun',
-      experience: 3
-    }
-  ];
+  private apiUrl = 'http://localhost:8080/api/chauffeurs';
 
-  chauffeurs = signal<Chauffeur[]>(this.chauffeursData);
+  constructor(private http: HttpClient) {}
+
+  // signals pour stocker les données et la recherche
+  chauffeurs = signal<Chauffeur[]>([]);
   searchQuery = signal('');
 
-  constructor() {}
+  // Récupère les chauffeurs depuis l'API
+  getChauffeurs() {
+    return this.http.get<Chauffeur[]>(this.apiUrl);
+  }
 
-  getFilteredChauffeurs() {
+  loadChauffeurs() {
+    this.getChauffeurs().subscribe({
+      next: data => {
+        this.chauffeurs.set(data);
+        console.log('Chauffeurs chargés :', data);
+      },
+      error: err => {
+        console.error('Erreur API', err);
+      }
+    });
+  }
+
+  // filtrer les chauffeurs selon la recherche
+  filteredChauffeurs = computed(() => {
     const query = this.searchQuery().toLowerCase();
+
     if (!query) return this.chauffeurs();
 
-    return this.chauffeurs().filter(chauffeur => 
-      chauffeur.nom.toLowerCase().includes(query) ||
-      chauffeur.prenom.toLowerCase().includes(query) ||
-      chauffeur.telephone.includes(query) ||
-      chauffeur.email.toLowerCase().includes(query) ||
-      chauffeur.numeroPermis.toLowerCase().includes(query) ||
-      (chauffeur.vehiculeAttribue?.immatriculation.toLowerCase().includes(query) ?? false)
+    return this.chauffeurs().filter(c =>
+      c.nom?.toLowerCase().includes(query) ||
+      c.prenom?.toLowerCase().includes(query) ||
+      c.telephone?.includes(query) ||
+      c.email?.toLowerCase().includes(query) ||
+      c.numeroPermis?.toLowerCase().includes(query) ||
+      (c.vehiculeAttribue?.immatriculation?.toLowerCase().includes(query) ?? false)
     );
-  }
+  });
+
+  // statistiques basiques
+  stats = computed(() => ({
+    total: this.chauffeurs().length,
+    actifs: this.chauffeurs().filter(c => c.statut === 'actif').length,
+    mission: this.chauffeurs().filter(c => c.statut === 'mission').length,
+    conge: this.chauffeurs().filter(c => c.statut === 'congé').length,
+    inactifs: this.chauffeurs().filter(c => c.statut === 'inactif').length
+  }));
+
+  // crud operations
 
   addChauffeur(chauffeur: Chauffeur) {
-    const newId = Math.max(...this.chauffeurs().map(c => c.id)) + 1;
-    const newChauffeur = { ...chauffeur, id: newId };
-    this.chauffeurs.update(list => [...list, newChauffeur]);
+    return this.http.post<Chauffeur>(this.apiUrl, chauffeur).subscribe(newCh => {
+      this.chauffeurs.update(list => [...list, newCh]);
+    });
   }
 
-  updateChauffeur(id: number, updatedChauffeur: Partial<Chauffeur>) {
-    this.chauffeurs.update(list =>
-      list.map(chauffeur =>
-        chauffeur.id === id ? { ...chauffeur, ...updatedChauffeur } : chauffeur
-      )
-    );
+  updateChauffeur(id: number, chauffeur: Chauffeur) {
+    return this.http.put<Chauffeur>(`${this.apiUrl}/${id}`, chauffeur).subscribe(updated => {
+      this.chauffeurs.update(list =>
+        list.map(c => c.id === id ? updated : c)
+      );
+    });
   }
 
   deleteChauffeur(id: number) {
-    this.chauffeurs.update(list => list.filter(chauffeur => chauffeur.id !== id));
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).subscribe({
+      next: () => {
+        console.log(`Chauffeur ${id} supprimé avec succès`);
+        this.chauffeurs.update(list => list.filter(c => c.id !== id));
+      },
+      error: err => {
+        console.error('Erreur lors de la suppression du chauffeur :', err);
+      }
+    });
   }
 }

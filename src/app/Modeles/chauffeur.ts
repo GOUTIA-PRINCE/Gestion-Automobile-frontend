@@ -12,6 +12,10 @@ export interface Chauffeur {
     modele: string;
     immatriculation: string;
   };
+  /*
+  vehiculeAttribue doit etre modifier par ceci plus tard 
+  vehiculeAttribue?: Vehicules;
+  */
   photoUrl?: string;
   dateNaissance?: string;
   adresse?: string;
