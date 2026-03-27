@@ -28,6 +28,8 @@ export class ChauffeursComponent implements OnInit {
   selectedChauffeur = signal<Chauffeur | null>(null);
   canManage = true;
 
+  formData: Partial<Chauffeur> & { vehiculeAttribue: { marque: string; modele: string; immatriculation: string } } = this.createEmptyForm();
+
   ngOnInit(): void {
     this.isLoading.set(true);
     this.chauffeurService.getChauffeurs().subscribe({
@@ -46,11 +48,16 @@ export class ChauffeursComponent implements OnInit {
   // ACTIONS
   handleAdd(): void {
     this.selectedChauffeur.set(null);
+    this.formData = this.createEmptyForm();
     this.isFormOpen.set(true);
   }
 
   handleEdit(chauffeur: Chauffeur): void {
     this.selectedChauffeur.set(chauffeur);
+    this.formData = {
+      ...chauffeur,
+      vehiculeAttribue: chauffeur.vehiculeAttribue ? { ...chauffeur.vehiculeAttribue } : { marque: '', modele: '', immatriculation: '' }
+    };
     this.isFormOpen.set(true);
   }
 
@@ -58,6 +65,61 @@ export class ChauffeursComponent implements OnInit {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce chauffeur ?')) {
       this.chauffeurService.deleteChauffeur(id);
     }
+  }
+
+  handleSubmit(): void {
+    const payload: Omit<Chauffeur, 'id'> = {
+      nom: this.formData.nom?.trim() || '',
+      prenom: this.formData.prenom?.trim() || '',
+      telephone: this.formData.telephone || '',
+      email: this.formData.email || '',
+      numeroPermis: this.formData.numeroPermis || '',
+      dateEmbauche: this.formData.dateEmbauche || '',
+      statut: this.formData.statut || 'actif',
+      photoUrl: this.formData.photoUrl || '',
+      dateNaissance: this.formData.dateNaissance || '',
+      adresse: this.formData.adresse || '',
+      experience: this.formData.experience ?? 0,
+      vehiculeAttribue: this.formData.vehiculeAttribue?.marque || this.formData.vehiculeAttribue?.modele || this.formData.vehiculeAttribue?.immatriculation
+        ? {
+            marque: this.formData.vehiculeAttribue?.marque || '',
+            modele: this.formData.vehiculeAttribue?.modele || '',
+            immatriculation: this.formData.vehiculeAttribue?.immatriculation || ''
+          }
+        : undefined
+    };
+
+    if (this.selectedChauffeur()) {
+      const id = this.selectedChauffeur()!.id;
+      this.chauffeurService.updateChauffeur(id, { ...(payload as Chauffeur), id });
+    } else {
+      this.chauffeurService.addChauffeur(payload);
+    }
+
+    this.closeForm();
+  }
+
+  closeForm(): void {
+    this.isFormOpen.set(false);
+    this.formData = this.createEmptyForm();
+    this.selectedChauffeur.set(null);
+  }
+
+  createEmptyForm(): Partial<Chauffeur> & { vehiculeAttribue: { marque: string; modele: string; immatriculation: string } } {
+    return {
+      nom: '',
+      prenom: '',
+      telephone: '',
+      email: '',
+      numeroPermis: '',
+      dateEmbauche: '',
+      statut: 'actif',
+      photoUrl: '',
+      dateNaissance: '',
+      adresse: '',
+      experience: 0,
+      vehiculeAttribue: { marque: '', modele: '', immatriculation: '' }
+    };
   }
 
   // TRACK BY

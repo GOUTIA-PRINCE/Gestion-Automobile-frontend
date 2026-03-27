@@ -256,7 +256,7 @@
 
   </div>
 
-  <!-- MODAL FORM (simplifié) -->
+  <!-- MODAL FORM -->
   <div *ngIf="isFormOpen()" class="modal fade show d-block" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -264,22 +264,169 @@
           <h5 class="modal-title">
             {{ selectedChauffeur() ? 'Modifier' : 'Ajouter' }} un chauffeur
           </h5>
-          <button type="button" class="btn-close" (click)="isFormOpen.set(false)"></button>
+          <button type="button" class="btn-close" (click)="closeForm()"></button>
         </div>
-        <div class="modal-body">
-          <!-- Formulaire simplifié pour l'exemple -->
-          <p>Formulaire d'ajout/modification ici...</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="isFormOpen.set(false)">
-            Annuler
-          </button>
-          <button type="button" class="btn btn-primary">
-            {{ selectedChauffeur() ? 'Modifier' : 'Ajouter' }}
-          </button>
-        </div>
+        <form #chauffeurForm="ngForm" (ngSubmit)="handleSubmit()">
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Prénom</label>
+                <input
+                  name="prenom"
+                  class="form-control"
+                  [(ngModel)]="formData.prenom"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Nom</label>
+                <input
+                  name="nom"
+                  class="form-control"
+                  [(ngModel)]="formData.nom"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Téléphone</label>
+                <input
+                  name="telephone"
+                  class="form-control"
+                  [(ngModel)]="formData.telephone"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  class="form-control"
+                  [(ngModel)]="formData.email"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Numéro de permis</label>
+                <input
+                  name="numeroPermis"
+                  class="form-control"
+                  [(ngModel)]="formData.numeroPermis"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Statut</label>
+                <select
+                  name="statut"
+                  class="form-select"
+                  [(ngModel)]="formData.statut"
+                >
+                  <option value="actif">Actif</option>
+                  <option value="mission">En mission</option>
+                  <option value="congé">En congé</option>
+                  <option value="inactif">Inactif</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Date d'embauche</label>
+                <input
+                  type="date"
+                  name="dateEmbauche"
+                  class="form-control"
+                  [(ngModel)]="formData.dateEmbauche"
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Expérience (années)</label>
+                <input
+                  type="number"
+                  name="experience"
+                  class="form-control"
+                  [(ngModel)]="formData.experience"
+                  min="0"
+                />
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Adresse</label>
+                <input
+                  name="adresse"
+                  class="form-control"
+                  [(ngModel)]="formData.adresse"
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Date de naissance</label>
+                <input
+                  type="date"
+                  name="dateNaissance"
+                  class="form-control"
+                  [(ngModel)]="formData.dateNaissance"
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Photo URL</label>
+                <input
+                  type="url"
+                  name="photoUrl"
+                  class="form-control"
+                  [(ngModel)]="formData.photoUrl"
+                />
+              </div>
+
+              <div class="col-12 pt-3 border-top mt-3">
+                <h6 class="mb-3">Véhicule attribué</h6>
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label">Marque</label>
+                    <input
+                      name="vehiculeMarque"
+                      class="form-control"
+                      [(ngModel)]="formData.vehiculeAttribue.marque"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Modèle</label>
+                    <input
+                      name="vehiculeModele"
+                      class="form-control"
+                      [(ngModel)]="formData.vehiculeAttribue.modele"
+                    />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Immatriculation</label>
+                    <input
+                      name="vehiculeImmatriculation"
+                      class="form-control"
+                      [(ngModel)]="formData.vehiculeAttribue.immatriculation"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeForm()">
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="chauffeurForm.invalid">
+              {{ selectedChauffeur() ? 'Modifier' : 'Ajouter' }}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-  <!-- <div *ngIf="isFormOpen()" class="modal-backdrop fade show"></div> -->
+  <div *ngIf="isFormOpen()" class="modal-backdrop fade show"></div>
 </div>
