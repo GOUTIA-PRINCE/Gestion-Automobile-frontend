@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Chauffeur } from '../../Modeles/chauffeur';
 import { ChauffeurService } from '../../services/chauffeur.service';
+import { Vehicules } from '../../Modeles/vehicules';
+import { VehiculesService } from '../../services/vehicules.service';
 
 @Component({
   selector: 'app-chauffeurs',
@@ -15,12 +17,16 @@ export class ChauffeursComponent implements OnInit {
 
   // Services
   private chauffeurService = inject(ChauffeurService);
+  private vehiculesService = inject(VehiculesService);
 
   // Signals partagés avec le service
   chauffeurs = this.chauffeurService.chauffeurs;
   searchQuery = this.chauffeurService.searchQuery;
   filteredChauffeurs = this.chauffeurService.filteredChauffeurs;
   stats = this.chauffeurService.stats;
+
+  vehicules = signal<Vehicules[]>([]);
+  availableVehicules = computed(() => this.vehicules().filter(v => v.statut === 'actif'));
 
   // États locaux
   isLoading = signal(false);
@@ -41,6 +47,15 @@ export class ChauffeursComponent implements OnInit {
       error: err => {
         console.error('Erreur API', err);
         this.isLoading.set(false);
+      }
+    });
+
+    this.vehiculesService.getVehicules().subscribe({
+      next: data => {
+        this.vehicules.set(data);
+      },
+      error: err => {
+        console.error('Erreur récupération véhicules :', err);
       }
     });
   }
@@ -97,6 +112,23 @@ export class ChauffeursComponent implements OnInit {
     }
 
     this.closeForm();
+  }
+
+  onVehiculeSelect(immatriculation: string): void {
+    const selected = this.availableVehicules().find((v: Vehicules) => v.immatriculation === immatriculation);
+    if (selected) {
+      this.formData.vehiculeAttribue = {
+        marque: selected.marque,
+        modele: selected.modele,
+        immatriculation: selected.immatriculation
+      };
+    } else {
+      this.formData.vehiculeAttribue = { marque: '', modele: '', immatriculation: '' };
+    }
+  }
+
+  formatVehiculeStatut(statut: Vehicules['statut']): string {
+    return statut === 'actif' ? 'Disponible' : statut.replace('_', ' ');
   }
 
   closeForm(): void {

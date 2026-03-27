@@ -387,29 +387,22 @@
               <div class="col-12 pt-3 border-top mt-3">
                 <h6 class="mb-3">Véhicule attribué</h6>
                 <div class="row g-3">
-                  <div class="col-md-4">
-                    <label class="form-label">Marque</label>
-                    <input
-                      name="vehiculeMarque"
-                      class="form-control"
-                      [(ngModel)]="formData.vehiculeAttribue.marque"
-                    />
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label">Modèle</label>
-                    <input
-                      name="vehiculeModele"
-                      class="form-control"
-                      [(ngModel)]="formData.vehiculeAttribue.modele"
-                    />
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label">Immatriculation</label>
-                    <input
-                      name="vehiculeImmatriculation"
-                      class="form-control"
+                  <div class="col-12">
+                    <label class="form-label">Sélectionner un véhicule disponible</label>
+                    <select
+                      name="vehiculeAttribue"
+                      class="form-select"
                       [(ngModel)]="formData.vehiculeAttribue.immatriculation"
-                    />
+                      (ngModelChange)="onVehiculeSelect($event)"
+                    >
+                      <option value="">Aucun véhicule</option>
+                      <option
+                        *ngFor="let v of availableVehicules()"
+                        [value]="v.immatriculation"
+                      >
+                        {{ v.marque }} {{ v.modele }} - {{ v.immatriculation }} ({{ formatVehiculeStatut(v.statut) }})
+                      </option>
+                    </select>
                   </div>
                 </div>
               </div>
