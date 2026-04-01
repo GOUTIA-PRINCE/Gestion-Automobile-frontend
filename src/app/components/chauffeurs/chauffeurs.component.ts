@@ -21,9 +21,17 @@ export class ChauffeursComponent implements OnInit {
 
   // Signals partagés avec le service
   chauffeurs = this.chauffeurService.chauffeurs;
-  searchQuery = this.chauffeurService.searchQuery;
   filteredChauffeurs = this.chauffeurService.filteredChauffeurs;
   stats = this.chauffeurService.stats;
+
+  // Propriété intermédiaire pour searchQuery (améliore la réactivité avec ngModel)
+  get searchQuery(): string {
+    return this.chauffeurService.searchQuery();
+  }
+
+  set searchQuery(value: string) {
+    this.chauffeurService.searchQuery.set(value);
+  }
 
   vehicules = signal<Vehicules[]>([]);
   availableVehicules = computed(() => this.vehicules().filter(v => v.statut === 'actif'));
@@ -67,6 +75,7 @@ export class ChauffeursComponent implements OnInit {
     this.isFormOpen.set(true);
   }
 
+  //
   handleEdit(chauffeur: Chauffeur): void {
     this.selectedChauffeur.set(chauffeur);
     const selectedVehicule = chauffeur.vehiculeAttribue?.id

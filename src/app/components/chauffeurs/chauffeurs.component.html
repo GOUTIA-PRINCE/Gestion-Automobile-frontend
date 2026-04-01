@@ -21,8 +21,7 @@
           type="text"
           class="form-control border-start-0"
           placeholder="Rechercher un chauffeur..."
-          [ngModel]="searchQuery()"
-          (ngModelChange)="searchQuery.set($event)"
+          [(ngModel)]="searchQuery"
         />
         
       </div>

@@ -21,8 +21,7 @@
           type="text"
           class="form-control border-start-0"
           placeholder="Rechercher ..."
-          [ngModel]="searchQuery()"
-          (ngModelChange)="searchQuery.set($event)"
+          [(ngModel)]="searchQuery"
         />
         
       </div>
@@ -208,13 +207,20 @@
 
         <!-- Actions -->
         <div class="card-footer bg-transparent border-top-0 pt-0 px-4 pb-4" *ngIf="canManage">
-          <div class="d-flex justify-content-end">
+          <div class="d-flex justify-content-between">
+            <button
+              class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1"
+              (click)="handleDelete(v.id)"
+            >
+              <i class="bi bi-trash"></i>
+              <span class="d-none d-md-inline">Supprimer</span>
+            </button>
             <button
               class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
               (click)="handleEdit(v)"
             >
               <i class="bi bi-pencil"></i>
-              Modifier
+              <span class="d-none d-md-inline">Modifier</span>
             </button>
           </div>
         </div>
@@ -223,4 +229,118 @@
     </div>
 
   </div>
+  
+
+  <!-- MODAL FORM -->
+  <div *ngIf="isFormOpen()" class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            {{ selectedVehicle() ? 'Modifier' : 'Ajouter' }} un véhicule
+          </h5>
+          <button type="button" class="btn-close" (click)="closeForm()"></button>
+        </div>
+        <form #vehiculeForm="ngForm" (ngSubmit)="handleSubmit()">
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Marque</label>
+                <input
+                  name="marque"
+                  class="form-control"
+                  [(ngModel)]="formData.marque"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Modèle</label>
+                <input
+                  name="modele"
+                  class="form-control"
+                  [(ngModel)]="formData.modele"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Immatriculation</label>
+                <input
+                  name="immatriculation"
+                  class="form-control"
+                  [(ngModel)]="formData.immatriculation"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Année</label>
+                <input
+                  type="number"
+                  name="annee"
+                  class="form-control"
+                  [(ngModel)]="formData.annee"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Type de véhicule</label>
+                <select
+                  name="typeVehicule"
+                  class="form-select"
+                  [(ngModel)]="formData.typeVehicule"
+                  required
+                >
+                  <option value="Break">Break</option>
+                  <option value="Pick-up">Pick-up</option>
+                  <option value="Berline">Berline</option>
+                  <option value="SUV">SUV</option>
+                  <option value="Camion">Camion</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Kilométrage</label>
+                <input
+                  type="number"
+                  name="kilometrage"
+                  class="form-control"
+                  [(ngModel)]="formData.kilometrage"
+                  min="0"
+                />
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Statut</label>
+                <select
+                  name="statut"
+                  class="form-select"
+                  [(ngModel)]="formData.statut"
+                  required
+                >
+                  <option value="actif">Actif</option>
+                  <option value="en_maintenance">En maintenance</option>
+                  <option value="en_panne">En panne</option>
+                  <option value="retire">Retiré</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeForm()">
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="vehiculeForm.invalid">
+              {{ selectedVehicle() ? 'Modifier' : 'Ajouter' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="isFormOpen()" class="modal-backdrop fade show"></div>
+
 </div>
