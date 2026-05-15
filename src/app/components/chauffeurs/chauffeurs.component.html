@@ -81,8 +81,8 @@
               <i class="bi bi-briefcase text-warning fs-5"></i>
             </div>
             <div>
-              <div class="text-muted small">En mission</div>
-              <div class="h4 mb-0 fw-bold text-warning">{{ stats().mission }}</div>
+              <div class="text-muted small">Inactifs</div>
+              <div class="h4 mb-0 fw-bold text-warning">{{ stats().inactifs }}</div>
             </div>
           </div>
         </div>
@@ -97,8 +97,8 @@
               <i class="bi bi-umbrella text-info fs-5"></i>
             </div>
             <div>
-              <div class="text-muted small">En congé</div>
-              <div class="h4 mb-0 fw-bold text-info">{{ stats().conge }}</div>
+              <div class="text-muted small">Disponibles</div>
+              <div class="h4 mb-0 fw-bold text-info">{{ stats().disponibles }}</div>
             </div>
           </div>
         </div>
@@ -136,16 +136,13 @@
           <span
             class="badge px-3 py-2 fw-semibold"
             [ngClass]="{
-              'bg-success': c.statut === 'actif',
-              'bg-warning text-dark': c.statut === 'mission',
-              'bg-info': c.statut === 'congé',
-              'bg-secondary': c.statut === 'inactif'
+              'bg-success': c.statut === 'ACTIF',
+              'bg-warning text-dark': c.statut === 'MISSION',
+              'bg-info': c.statut === 'EN_CONGE',
+              'bg-secondary': c.statut === 'INACTIF'
             }"
           >
-            {{ c.statut === 'actif' ? 'Actif' : 
-               c.statut === 'mission' ? 'En mission' : 
-               c.statut === 'congé' ? 'En congé' : 
-               'Inactif' }}
+            {{ formatStatut(c.statut) }}
           </span>
         </div>
 
@@ -212,17 +209,18 @@
           <!-- Informations additionnelles -->
           <div class="row g-2 mb-4">
             <div class="col-6">
-              <div class="text-muted small mb-1">Embauché le</div>
+              <div class="text-muted small mb-1">Permis expire</div>
               <div class="fw-medium">
                 <i class="bi bi-calendar3 me-1"></i>
-                {{ formatDate(c.dateEmbauche) }}
+                {{ formatDate(c.dateExpirationPermis) }}
+                <span *ngIf="isPermisExpire(c.dateExpirationPermis)" class="badge bg-danger ms-2">Expiré</span>
               </div>
             </div>
             <div class="col-6">
               <div class="text-muted small mb-1">Expérience</div>
               <div class="fw-medium">
                 <i class="bi bi-graph-up me-1"></i>
-                {{ c.experience || 0 }} ans
+                {{ c.experienceAnnees || 0 }} ans
               </div>
             </div>
           </div>
@@ -255,35 +253,131 @@
 
   </div>
 
-  <!-- MODAL FORM -->
+  <!-- MODAL FORM STEPPER -->
   <div *ngIf="isFormOpen()" class="modal fade show d-block" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header">
+        
+        <!-- Modal Header with progress -->
+        <div class="modal-header border-bottom">
           <h5 class="modal-title">
             {{ selectedChauffeur() ? 'Modifier' : 'Ajouter' }} un chauffeur
           </h5>
           <button type="button" class="btn-close" (click)="closeForm()"></button>
         </div>
-        <form #chauffeurForm="ngForm" (ngSubmit)="handleSubmit()">
-          <div class="modal-body">
-            <div class="row g-3">
+
+        <!-- Stepper Progress Bar -->
+        <div class="px-4 pt-3 pb-0">
+          <div class="progress" style="height: 4px;">
+            <div 
+              class="progress-bar" 
+              role="progressbar" 
+              [style.width.%]="(getCurrentStepIndex() + 1) * 20"
+              aria-valuenow="20" 
+              aria-valuemin="0" 
+              aria-valuemax="100">
+            </div>
+          </div>
+          <div class="d-flex justify-content-between mt-2 mb-3">
+            <small class="fw-semibold" [class.text-primary]="currentStep() === 'photo'">
+              <i [class]="stepCompletionStatus().photo ? 'bi bi-check-circle-fill text-success' : 'bi bi-circle'" class="me-1"></i>
+              Photo
+            </small>
+            <small class="fw-semibold" [class.text-primary]="currentStep() === 'perso'">
+              <i [class]="stepCompletionStatus().perso ? 'bi bi-check-circle-fill text-success' : 'bi bi-circle'" class="me-1"></i>
+              Infos perso
+            </small>
+            <small class="fw-semibold" [class.text-primary]="currentStep() === 'permis'">
+              <i [class]="stepCompletionStatus().permis ? 'bi bi-check-circle-fill text-success' : 'bi bi-circle'" class="me-1"></i>
+              Permis
+            </small>
+            <small class="fw-semibold" [class.text-primary]="currentStep() === 'pro'">
+              <i [class]="stepCompletionStatus().pro ? 'bi bi-check-circle-fill text-success' : 'bi bi-circle'" class="me-1"></i>
+              Professionnel
+            </small>
+            <small class="fw-semibold" [class.text-primary]="currentStep() === 'vehicule'">
+              <i [class]="stepCompletionStatus().vehicule ? 'bi bi-check-circle-fill text-success' : 'bi bi-circle'" class="me-1"></i>
+              Véhicule
+            </small>
+          </div>
+        </div>
+
+        <form (ngSubmit)="handleSubmit()" class="needs-validation">
+          <div class="modal-body" style="min-height: 400px;">
+            
+            <!-- STEP 1: PHOTO -->
+            <div *ngIf="currentStep() === 'photo'" class="text-center">
+              <h6 class="mb-4">Ajouter une photo de profil</h6>
+              
+              <!-- Photo Preview -->
+              <div class="mb-4">
+                <div class="avatar-preview rounded-circle mx-auto mb-3" 
+                     style="width: 120px; height: 120px; overflow: hidden; background: #f0f0f0;">
+                  <img 
+                    *ngIf="formData.photoProfile"
+                    [src]="formData.photoProfile"
+                    class="img-fluid h-100 w-100 object-fit-cover"
+                  />
+                  <div *ngIf="!formData.photoProfile" class="h-100 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-person-circle text-muted" style="font-size: 3rem;"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- File Input -->
+              <div class="mb-3">
+                <input 
+                  type="file" 
+                  class="form-control" 
+                  accept="image/*"
+                  (change)="onPhotoSelected($event)"
+                  id="photoInput"
+                />
+                <small class="text-muted d-block mt-2">JPG, PNG, GIF. Taille max: 5MB</small>
+              </div>
+
+              <div class="alert alert-info small" role="alert">
+                <i class="bi bi-info-circle me-2"></i>
+                Vous pouvez ignorer cette étape et ajouter une photo plus tard
+              </div>
+            </div>
+
+            <!-- STEP 2: INFOS PERSONNELLES -->
+            <div *ngIf="currentStep() === 'perso'" class="row g-3">
+              <h6 class="col-12">Informations personnelles</h6>
+              
               <div class="col-md-6">
-                <label class="form-label">Prénom</label>
+                <label class="form-label">Prénom <span class="text-danger">*</span></label>
                 <input
+                  type="text"
                   name="prenom"
                   class="form-control"
                   [(ngModel)]="formData.prenom"
+                  placeholder="ex: Jean"
                   required
                 />
               </div>
 
               <div class="col-md-6">
-                <label class="form-label">Nom</label>
+                <label class="form-label">Nom <span class="text-danger">*</span></label>
                 <input
+                  type="text"
                   name="nom"
                   class="form-control"
                   [(ngModel)]="formData.nom"
+                  placeholder="ex: Dupont"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Email <span class="text-danger">*</span></label>
+                <input
+                  type="email"
+                  name="email"
+                  class="form-control"
+                  [(ngModel)]="formData.email"
+                  placeholder="ex: jean.dupont@email.com"
                   required
                 />
               </div>
@@ -291,30 +385,70 @@
               <div class="col-md-6">
                 <label class="form-label">Téléphone</label>
                 <input
+                  type="tel"
                   name="telephone"
                   class="form-control"
                   [(ngModel)]="formData.telephone"
-                  required
+                  placeholder="ex: 06 12 34 56 78"
                 />
               </div>
 
-              <div class="col-md-6">
-                <label class="form-label">Email</label>
+              <div class="col-12">
+                <label class="form-label">Adresse</label>
                 <input
-                  type="email"
-                  name="email"
+                  type="text"
+                  name="adresse"
                   class="form-control"
-                  [(ngModel)]="formData.email"
-                  required
+                  [(ngModel)]="formData.adresse"
+                  placeholder="ex: 123 rue de la Paix, 75000 Paris"
                 />
               </div>
+            </div>
 
+            <!-- STEP 3: PERMIS -->
+            <div *ngIf="currentStep() === 'permis'" class="row g-3">
+              <h6 class="col-12">Permis de conduire</h6>
+              
               <div class="col-md-6">
-                <label class="form-label">Numéro de permis</label>
+                <label class="form-label">Numéro de permis <span class="text-danger">*</span></label>
                 <input
+                  type="text"
                   name="numeroPermis"
                   class="form-control"
                   [(ngModel)]="formData.numeroPermis"
+                  placeholder="ex: PERM123456"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Catégorie <span class="text-danger">*</span></label>
+                <select
+                  name="categoriePermis"
+                  class="form-select"
+                  [(ngModel)]="formData.categoriePermis"
+                  required
+                >
+                  <option value="">-- Sélectionner --</option>
+                  <option value="A">A - Motocyclettes</option>
+                  <option value="A1">A1 - Motocyclettes légères</option>
+                  <option value="B">B - Voitures</option>
+                  <option value="B1">B1 - Tricycles</option>
+                  <option value="C">C - Poids lourd</option>
+                  <option value="C1">C1 - Poids lourd limité</option>
+                  <option value="D">D - Autobus</option>
+                  <option value="D1">D1 - Minibus</option>
+                  <option value="E">E - Remorque</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Date d'expiration <span class="text-danger">*</span></label>
+                <input
+                  type="date"
+                  name="dateExpirationPermis"
+                  class="form-control"
+                  [(ngModel)]="formData.dateExpirationPermis"
                   required
                 />
               </div>
@@ -326,97 +460,145 @@
                   class="form-select"
                   [(ngModel)]="formData.statut"
                 >
-                  <option value="actif">Actif</option>
-                  <option value="mission">En mission</option>
-                  <option value="congé">En congé</option>
-                  <option value="inactif">Inactif</option>
+                  <option value="ACTIF">Actif</option>
+                  <option value="MISSION">En mission</option>
+                  <option value="EN_CONGE">En congé</option>
+                  <option value="INACTIF">Inactif</option>
                 </select>
+              </div>
+            </div>
+
+            <!-- STEP 4: PROFESSIONNEL -->
+            <div *ngIf="currentStep() === 'pro'" class="row g-3">
+              <h6 class="col-12">Informations professionnelles</h6>
+              
+              <div class="col-md-6">
+                <label class="form-label">Mot de passe</label>
+                <input
+                  type="password"
+                  name="password"
+                  class="form-control"
+                  [(ngModel)]="formData.password"
+                  placeholder="Entrer un mot de passe"
+                />
               </div>
 
               <div class="col-md-6">
-                <label class="form-label">Date d'embauche</label>
-                <input
-                  type="date"
-                  name="dateEmbauche"
-                  class="form-control"
-                  [(ngModel)]="formData.dateEmbauche"
-                />
+                <label class="form-label">Site d'affectation</label>
+                <select
+                  name="site"
+                  class="form-select"
+                  [(ngModel)]="formData.site"
+                >
+                  <option value="">-- Sélectionner --</option>
+                  <option *ngFor="let site of SITES_DISPONIBLES" [value]="site">
+                    {{ site }}
+                  </option>
+                </select>
               </div>
 
               <div class="col-md-6">
                 <label class="form-label">Expérience (années)</label>
                 <input
                   type="number"
-                  name="experience"
+                  name="experienceAnnees"
                   class="form-control"
-                  [(ngModel)]="formData.experience"
+                  [(ngModel)]="formData.experienceAnnees"
                   min="0"
-                />
-              </div>
-
-              <div class="col-12">
-                <label class="form-label">Adresse</label>
-                <input
-                  name="adresse"
-                  class="form-control"
-                  [(ngModel)]="formData.adresse"
+                  placeholder="ex: 5"
                 />
               </div>
 
               <div class="col-md-6">
-                <label class="form-label">Date de naissance</label>
-                <input
-                  type="date"
-                  name="dateNaissance"
-                  class="form-control"
-                  [(ngModel)]="formData.dateNaissance"
-                />
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">Photo URL</label>
-                <input
-                  type="url"
-                  name="photoUrl"
-                  class="form-control"
-                  [(ngModel)]="formData.photoUrl"
-                />
-              </div>
-
-              <div class="col-12 pt-3 border-top mt-3">
-                <h6 class="mb-3">Véhicule attribué</h6>
-                <div class="row g-3">
-                  <div class="col-12">
-                    <label class="form-label">Sélectionner un véhicule disponible</label>
-                    <select
-                      name="vehiculeAttribue"
-                      class="form-select"
-                      [(ngModel)]="formData.vehiculeAttribue.id"
-                      (ngModelChange)="onVehiculeSelect($event)"
-                    >
-                      <option [ngValue]="undefined">Aucun véhicule</option>
-                      <option
-                        *ngFor="let v of availableVehicules()"
-                        [ngValue]="v.id"
-                      >
-                        {{ v.marque }} {{ v.modele }} - {{ v.immatriculation }} ({{ formatVehiculeStatut(v.statut) }})
-                      </option>
-                    </select>
-                  </div>
+                <div class="form-check mt-4">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    name="disponible"
+                    [(ngModel)]="formData.disponible"
+                    id="disponibleCheck"
+                  />
+                  <label class="form-check-label" for="disponibleCheck">
+                    Disponible pour missions
+                  </label>
                 </div>
               </div>
             </div>
+
+            <!-- STEP 5: VEHICULE -->
+            <div *ngIf="currentStep() === 'vehicule'" class="row g-3">
+              <h6 class="col-12">Attribution de véhicule</h6>
+              
+              <div class="col-12">
+                <label class="form-label">Sélectionner un véhicule disponible</label>
+                <select
+                  class="form-select"
+                  (change)="onVehiculeSelect($any($event.target).value)"
+                >
+                  <option value="">-- Aucun véhicule --</option>
+                  <option
+                    *ngFor="let v of availableVehicules()"
+                    [value]="v.id"
+                  >
+                    {{ v.marque }} {{ v.modele }} ({{ v.immatriculation }}) - {{ v.statut }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="col-12" *ngIf="formData.vehiculeAttribue && formData.vehiculeAttribue.marque">
+                <div class="alert alert-success">
+                  <strong>Véhicule sélectionné:</strong><br/>
+                  {{ formData.vehiculeAttribue.marque }} {{ formData.vehiculeAttribue.modele }}<br/>
+                  <small class="text-muted">{{ formData.vehiculeAttribue.immatriculation }}</small>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="alert alert-info small">
+                  <i class="bi bi-info-circle me-2"></i>
+                  Vous pouvez modifier cette attribution ultérieurement
+                </div>
+              </div>
+            </div>
+
           </div>
 
+          <!-- Modal Footer with Navigation -->
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="closeForm()">
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              (click)="previousStep()"
+              [disabled]="currentStep() === 'photo'"
+            >
+              <i class="bi bi-chevron-left me-1"></i> Précédent
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-secondary" 
+              (click)="closeForm()"
+            >
               Annuler
             </button>
-            <button type="submit" class="btn btn-primary" [disabled]="chauffeurForm.invalid">
-              {{ selectedChauffeur() ? 'Modifier' : 'Ajouter' }}
+            <button 
+              type="button"
+              *ngIf="currentStep() !== 'vehicule'"
+              class="btn btn-primary"
+              (click)="nextStep()"
+            >
+              Suivant <i class="bi bi-chevron-right ms-1"></i>
+            </button>
+            <button 
+              type="submit"
+              *ngIf="currentStep() === 'vehicule'"
+              class="btn btn-success"
+            >
+              <i class="bi bi-check-lg me-1"></i>
+              {{ selectedChauffeur() ? 'Modifier' : 'Créer' }}
             </button>
           </div>
         </form>
+
       </div>
     </div>
   </div>

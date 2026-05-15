@@ -1,41 +1,33 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { Chauffeur } from '../Modeles/chauffeur';
 import { HttpClient } from '@angular/common/http';
+import { Observable, tap, catchError, throwError } from 'rxjs';
 
+/**
+ * Service de gestion des chauffeurs
+ * Communique avec l'API backend et maintient l'état local avec les Signals Angular 19
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class ChauffeurService {
 
-  private apiUrl = 'http://localhost:8080/api/chauffeurs';
+  private readonly apiUrl = 'http://localhost:8080/api/chauffeurs';
 
   constructor(private http: HttpClient) {}
 
-  // signals pour stocker les données et la recherche
+  // ─── Signals pour stocker les données ───────────────────────────────────
   chauffeurs = signal<Chauffeur[]>([]);
   searchQuery = signal('');
+  isLoading = signal(false);
+  error = signal<string | null>(null);
 
-  // Récupère les chauffeurs depuis l'API
-  getChauffeurs() {
-    return this.http.get<Chauffeur[]>(this.apiUrl);
-  }
-
-  loadChauffeurs() {
-    this.getChauffeurs().subscribe({
-      next: data => {
-        this.chauffeurs.set(data);
-        console.log('Chauffeurs chargés :', data);
-      },
-      error: err => {
-        console.error('Erreur API', err);
-      }
-    });
-  }
-
-  // filtrer les chauffeurs selon la recherche
+  // ─── Computed Values ───────────────────────────────────────────────────
+  /**
+   * Filtre les chauffeurs basé sur la recherche
+   */
   filteredChauffeurs = computed(() => {
     const query = this.searchQuery().toLowerCase();
-
     if (!query) return this.chauffeurs();
 
     return this.chauffeurs().filter(c =>
@@ -44,44 +36,130 @@ export class ChauffeurService {
       c.telephone?.includes(query) ||
       c.email?.toLowerCase().includes(query) ||
       c.numeroPermis?.toLowerCase().includes(query) ||
-      (c.vehiculeAttribue?.immatriculation?.toLowerCase().includes(query) ?? false)
+      c.categoriePermis?.toLowerCase().includes(query) ||
+      c.site?.toLowerCase().includes(query)
     );
   });
 
-  // statistiques basiques
+  /**
+   * Statistiques sur les chauffeurs
+   */
   stats = computed(() => ({
     total: this.chauffeurs().length,
-    actifs: this.chauffeurs().filter(c => c.statut === 'actif').length,
-    mission: this.chauffeurs().filter(c => c.statut === 'mission').length,
-    conge: this.chauffeurs().filter(c => c.statut === 'congé').length,
-    inactifs: this.chauffeurs().filter(c => c.statut === 'inactif').length
+    actifs: this.chauffeurs().filter(c => c.statut === 'ACTIF').length,
+    inactifs: this.chauffeurs().filter(c => c.statut !== 'ACTIF').length,
+    mission: this.chauffeurs().filter(c => c.statut === 'MISSION').length,
+    conge: this.chauffeurs().filter(c => c.statut === 'EN_CONGE').length,
+    disponibles: this.chauffeurs().filter(c => c.disponible).length,
   }));
 
-  // crud operations
+  // ─── Opérations READ ───────────────────────────────────────────────────
 
-  addChauffeur(chauffeur: Omit<Chauffeur, 'id'> & { vehiculeId?: number }) {
-    return this.http.post<Chauffeur>(this.apiUrl, chauffeur).subscribe(newCh => {
-      this.chauffeurs.update(list => [...list, newCh]);
-    });
+  /**
+   * Récupère tous les chauffeurs depuis l'API
+   */
+  getChauffeurs(): Observable<Chauffeur[]> {
+    return this.http.get<Chauffeur[]>(this.apiUrl).pipe(
+      tap(data => {
+        this.chauffeurs.set(data);
+        this.error.set(null);
+      }),
+      catchError(err => this.handleError(err))
+    );
   }
 
-  updateChauffeur(id: number, chauffeur: Chauffeur) {
-    return this.http.put<Chauffeur>(`${this.apiUrl}/${id}`, chauffeur).subscribe(updated => {
-      this.chauffeurs.update(list =>
-        list.map(c => c.id === id ? updated : c)
-      );
-    });
+  /**
+   * Récupère un chauffeur par son ID
+   */
+  getChauffeurById(id: number): Observable<Chauffeur> {
+    return this.http.get<Chauffeur>(`${this.apiUrl}/${id}`).pipe(
+      catchError(err => this.handleError(err))
+    );
   }
 
-  deleteChauffeur(id: number) {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`).subscribe({
-      next: () => {
-        console.log(`Chauffeur ${id} supprimé avec succès`);
-        this.chauffeurs.update(list => list.filter(c => c.id !== id));
-      },
-      error: err => {
-        console.error('Erreur lors de la suppression du chauffeur :', err);
+  /**
+   * Charge les chauffeurs et met à jour le signal
+   */
+  loadChauffeurs(): void {
+    this.isLoading.set(true);
+    this.getChauffeurs().subscribe({
+      next: () => this.isLoading.set(false),
+      error: (err) => {
+        this.isLoading.set(false);
+        this.error.set(err);
       }
     });
+  }
+
+  // ─── Opérations CREATE ─────────────────────────────────────────────────
+
+  /**
+   * Crée un nouveau chauffeur
+   * @param chauffeur Les données du chauffeur (sans id)
+   */
+  addChauffeur(chauffeur: Omit<Chauffeur, 'id' | 'dateCreation'>): Observable<Chauffeur> {
+    return this.http.post<Chauffeur>(this.apiUrl, chauffeur).pipe(
+      tap(newChauffeur => {
+        this.chauffeurs.update(list => [...list, newChauffeur]);
+        this.error.set(null);
+      }),
+      catchError(err => this.handleError(err))
+    );
+  }
+
+  // ─── Opérations UPDATE ────────────────────────────────────────────────
+
+  /**
+   * Met à jour un chauffeur existant
+   * @param id L'ID du chauffeur
+   * @param chauffeur Les données à mettre à jour
+   */
+  updateChauffeur(id: number, chauffeur: Partial<Chauffeur>): Observable<Chauffeur> {
+    return this.http.put<Chauffeur>(`${this.apiUrl}/${id}`, chauffeur).pipe(
+      tap(updatedChauffeur => {
+        this.chauffeurs.update(list =>
+          list.map(c => c.id === id ? updatedChauffeur : c)
+        );
+        this.error.set(null);
+      }),
+      catchError(err => this.handleError(err))
+    );
+  }
+
+  // ─── Opérations DELETE ────────────────────────────────────────────────
+
+  /**
+   * Supprime un chauffeur
+   * @param id L'ID du chauffeur à supprimer
+   */
+  deleteChauffeur(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        this.chauffeurs.update(list => list.filter(c => c.id !== id));
+        this.error.set(null);
+      }),
+      catchError(err => this.handleError(err))
+    );
+  }
+
+  // ─── Gestion des erreurs ────────────────────────────────────────────────
+
+  /**
+   * Gère les erreurs HTTP
+   */
+  private handleError(error: any) {
+    let errorMessage = 'Une erreur est survenue';
+    
+    if (error.error instanceof ErrorEvent) {
+      // Erreur côté client
+      errorMessage = `Erreur: ${error.error.message}`;
+    } else {
+      // Erreur côté serveur
+      errorMessage = `Erreur serveur: ${error.status} - ${error.error?.message || 'Veuillez réessayer'}`;
+    }
+    
+    this.error.set(errorMessage);
+    console.error(errorMessage, error);
+    return throwError(() => new Error(errorMessage));
   }
 }

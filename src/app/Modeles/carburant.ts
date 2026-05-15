@@ -12,6 +12,7 @@ export interface Plein {
   kilometrage: number;
   typeCarburant: 'Diesel' | 'Essence' | 'GPL';
   commentaire?: string;
+
 }
 
 export interface StatCarburant {
