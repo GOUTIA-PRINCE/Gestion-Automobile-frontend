@@ -14,7 +14,9 @@ export interface Document {
   dateMaj?: Date;
   taille: number; // en Ko
   extension: string;
-  cheminFichier: string;
+  nomFichier?: string;
+  typeContenu?: string;
+  donneesFichier?: string;
   statut: 'valide' | 'expire' | 'expirant' | 'invalide';
   categorie: 'vehicule' | 'chauffeur' | 'administratif' | 'financier';
   tags?: string[];

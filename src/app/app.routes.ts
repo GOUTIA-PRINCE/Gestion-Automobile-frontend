@@ -7,6 +7,8 @@ import { CarburantComponent } from './components/carburant/carburant.component';
 import { MaintenanceComponent } from './components/maintenance/maintenance.component';
 import { DocumentsComponent } from './components/documents/documents.component';
 import { AlertesComponent } from './components/alertes/alertes.component';
+import { ParametresComponent } from './components/parametres/parametres.component';
+import { AdminComponent } from './components/admin/admin.component';
 
 export const routes: Routes = [
     {path:'dashboard',component:DashboardComponent},
@@ -16,6 +18,8 @@ export const routes: Routes = [
     {path:'maintenance',component:MaintenanceComponent},
     {path:'documents',component:DocumentsComponent},
     {path:'alertes',component:AlertesComponent},
+    {path:'parametres',component:ParametresComponent},
+    {path:'admin',component:AdminComponent},
     // rediriger toutes les autres routes vers le tableau de bord
     { path: '**', redirectTo: 'dashboard' }
       

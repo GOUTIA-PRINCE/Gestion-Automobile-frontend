@@ -5,6 +5,8 @@ export interface Plein {
   vehiculeImmatriculation: string;
   vehiculeMarque: string;
   vehiculeModele: string;
+  chauffeurId?: number;
+  chauffeurNom?: string;
   quantite: number; // en litres
   cout: number; // en FCFA
   prixParLitre: number;

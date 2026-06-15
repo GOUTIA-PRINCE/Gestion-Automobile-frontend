@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/components/vehicules/vehicules.component.css"],
+  "sourcesContent": ["/* vehicules.component.css */\r\n.vehicles-page {\r\n  width: 100%;\r\n}\r\n\r\n/* Ajustez le responsive grid pour mieux utiliser l'espace */\r\n@media (min-width: 1400px) {\r\n  .col-xl-3 {\r\n    flex: 0 0 auto;\r\n    width: 25%;\r\n  }\r\n}\r\n\r\n/* Pour les tr\u00E8s grands \u00E9crans */\r\n@media (min-width: 1600px) {\r\n  .vehicles-page {\r\n    max-width: 1600px;\r\n  }\r\n}"],
+  "mappings": ";AACA,CAAC;AACC,SAAO;AACT;AAGA,OAAO,CAAC,SAAS,EAAE;AACjB,GAAC;AACC,UAAM,EAAE,EAAE;AACV,WAAO;AACT;AACF;AAGA,OAAO,CAAC,SAAS,EAAE;AACjB,GAdD;AAeG,eAAW;AACb;AACF;",
+  "names": []
+}

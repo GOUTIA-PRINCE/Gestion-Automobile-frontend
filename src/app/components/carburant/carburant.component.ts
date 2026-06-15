@@ -3,6 +3,11 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CarburantService } from '../../services/carburant.service';
 import { Chart, registerables } from 'chart.js';
+import { VehiculesService } from '../../services/vehicules.service';
+import { Vehicules } from '../../Modeles/vehicules';
+import { Plein } from '../../Modeles/carburant';
+import { ChauffeurService } from '../../services/chauffeur.service';
+import { Chauffeur } from '../../Modeles/chauffeur';
 
 @Component({
   selector: 'app-carburant',
@@ -12,6 +17,8 @@ import { Chart, registerables } from 'chart.js';
 })
 export class CarburantComponent implements OnInit {
   private carburantService = inject(CarburantService);
+  private vehiculesService = inject(VehiculesService);
+  private chauffeurService = inject(ChauffeurService);
   private platformId = inject(PLATFORM_ID);
 
   // Signals
@@ -21,6 +28,9 @@ export class CarburantComponent implements OnInit {
   isLoading = signal(false);
   isFormOpen = signal(false);
   selectedPlein = signal<any>(null);
+  vehicules = signal<Vehicules[]>([]);
+  chauffeurs = signal<Chauffeur[]>([]);
+  formData: Partial<Plein> = this.createEmptyForm();
   chart: Chart | null = null;
 
   // Computed
@@ -35,6 +45,14 @@ export class CarburantComponent implements OnInit {
 
   ngOnInit() {
     Chart.register(...registerables);
+    this.vehiculesService.getVehicules().subscribe({
+      next: data => this.vehicules.set(data),
+      error: err => console.error('Erreur chargement vehicules', err)
+    });
+    this.chauffeurService.getChauffeurs().subscribe({
+      next: data => this.chauffeurs.set(data),
+      error: err => console.error('Erreur chargement chauffeurs', err)
+    });
     this.initChart();
   }
 
@@ -113,12 +131,48 @@ export class CarburantComponent implements OnInit {
 
   handleAdd(): void {
     this.selectedPlein.set(null);
+    this.formData = this.createEmptyForm();
     this.isFormOpen.set(true);
   }
 
   handleEdit(plein: any): void {
     this.selectedPlein.set(plein);
+    this.formData = { ...plein };
     this.isFormOpen.set(true);
+  }
+
+  handleSubmit(): void {
+    const vehicule = this.vehicules().find(v => v.id === Number(this.formData.vehiculeId));
+    const chauffeur = this.chauffeurs().find(c => c.id === Number(this.formData.chauffeurId));
+    if (!vehicule || !this.formData.date || !this.formData.quantite || !this.formData.prixParLitre) {
+      alert('Veuillez renseigner le vehicule, la date, la quantite et le prix par litre');
+      return;
+    }
+
+    const plein: Omit<Plein, 'id'> = {
+      date: new Date(this.formData.date),
+      vehiculeId: vehicule.id,
+      vehiculeImmatriculation: vehicule.immatriculation,
+      vehiculeMarque: vehicule.marque,
+      vehiculeModele: vehicule.modele,
+      chauffeurId: chauffeur?.id,
+      chauffeurNom: chauffeur ? `${chauffeur.prenom} ${chauffeur.nom}` : undefined,
+      quantite: Number(this.formData.quantite),
+      cout: Number(this.formData.quantite) * Number(this.formData.prixParLitre),
+      prixParLitre: Number(this.formData.prixParLitre),
+      station: this.formData.station || '',
+      kilometrage: Number(this.formData.kilometrage || vehicule.kilometrage || 0),
+      typeCarburant: this.formData.typeCarburant || 'Diesel',
+      commentaire: this.formData.commentaire
+    };
+
+    const selected = this.selectedPlein();
+    if (selected) {
+      this.carburantService.updatePlein(selected.id, plein);
+    } else {
+      this.carburantService.addPlein(plein);
+    }
+    this.isFormOpen.set(false);
   }
 
   handleDelete(id: number): void {
@@ -139,5 +193,17 @@ export class CarburantComponent implements OnInit {
 
   trackById(index: number, item: any): number {
     return item.id;
+  }
+
+  private createEmptyForm(): Partial<Plein> {
+    return {
+      date: new Date(),
+      vehiculeId: undefined,
+      quantite: 0,
+      prixParLitre: 0,
+      station: '',
+      kilometrage: 0,
+      typeCarburant: 'Diesel'
+    };
   }
 }

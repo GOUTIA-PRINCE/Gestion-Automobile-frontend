@@ -2,6 +2,11 @@ import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MaintenanceService } from '../../services/maintenance.service';
+import { VehiculesService } from '../../services/vehicules.service';
+import { Vehicules } from '../../Modeles/vehicules';
+import { Entretien } from '../../Modeles/maintenance';
+import { UtilisateurService } from '../../services/utilisateur.service';
+import { Utilisateur } from '../../Modeles/utilisateur';
 @Component({
   selector: 'app-maintenance',
   imports: [CommonModule, FormsModule],
@@ -11,6 +16,8 @@ import { MaintenanceService } from '../../services/maintenance.service';
 export class MaintenanceComponent {
 
  private maintenanceService = inject(MaintenanceService);
+ private vehiculesService = inject(VehiculesService);
+ private utilisateurService = inject(UtilisateurService);
 
   // Signals
   entretiens = this.maintenanceService.entretiens;
@@ -19,6 +26,9 @@ export class MaintenanceComponent {
   isLoading = signal(false);
   isFormOpen = signal(false);
   selectedEntretien = signal<any>(null);
+  vehicules = signal<Vehicules[]>([]);
+  maintenanciers = signal<Utilisateur[]>([]);
+  formData: Partial<Entretien> = this.createEmptyForm();
 
   // Computed
   filteredEntretiens = computed(() => this.maintenanceService.getFilteredEntretiens());
@@ -39,15 +49,73 @@ export class MaintenanceComponent {
     return this.entretiens().filter(e => e.statut === 'planifie').slice(0, 3);
   });
 
+  constructor() {
+    this.vehiculesService.getVehicules().subscribe({
+      next: data => this.vehicules.set(data),
+      error: err => console.error('Erreur chargement vehicules', err)
+    });
+    this.maintenanciers.set(
+      this.utilisateurService.utilisateurs().filter(u => u.typeUtilisateur === 'MAINTENANCIER')
+    );
+    this.utilisateurService.loadUtilisateurs();
+    setTimeout(() => {
+      this.maintenanciers.set(
+        this.utilisateurService.utilisateurs().filter(u => u.typeUtilisateur === 'MAINTENANCIER')
+      );
+    }, 300);
+  }
+
   // Actions
   handleAdd(): void {
     this.selectedEntretien.set(null);
+    this.formData = this.createEmptyForm();
     this.isFormOpen.set(true);
   }
 
   handleEdit(entretien: any): void {
     this.selectedEntretien.set(entretien);
+    this.formData = { ...entretien };
     this.isFormOpen.set(true);
+  }
+
+  handleSubmit(): void {
+    const vehicule = this.vehicules().find(v => v.id === Number(this.formData.vehiculeId));
+    const maintenancier = this.maintenanciers().find(m => m.id === Number(this.formData.maintenancierId));
+    if (!vehicule || !this.formData.type || !this.formData.titre || !this.formData.datePlanifiee) {
+      alert('Veuillez renseigner le vehicule, le type, le titre et la date');
+      return;
+    }
+
+    const entretien: Omit<Entretien, 'id'> = {
+      vehiculeId: vehicule.id,
+      vehiculeImmatriculation: vehicule.immatriculation,
+      vehiculeMarque: vehicule.marque,
+      vehiculeModele: vehicule.modele,
+      maintenancierId: maintenancier?.id,
+      maintenancierNom: maintenancier ? `${maintenancier.prenom} ${maintenancier.nom}` : undefined,
+      type: this.formData.type,
+      titre: this.formData.titre,
+      description: this.formData.description || '',
+      datePlanifiee: new Date(this.formData.datePlanifiee),
+      dateDebut: this.formData.dateDebut ? new Date(this.formData.dateDebut) : undefined,
+      dateFin: this.formData.dateFin ? new Date(this.formData.dateFin) : undefined,
+      statut: this.formData.statut || 'planifie',
+      coutEstime: Number(this.formData.coutEstime || 0),
+      coutReel: this.formData.coutReel ? Number(this.formData.coutReel) : undefined,
+      kilometrageVehicule: Number(this.formData.kilometrageVehicule || vehicule.kilometrage || 0),
+      prochainEntretienKm: this.formData.prochainEntretienKm ? Number(this.formData.prochainEntretienKm) : undefined,
+      fournisseur: this.formData.fournisseur,
+      notes: this.formData.notes,
+      urgence: this.formData.urgence || 'moyenne'
+    };
+
+    const selected = this.selectedEntretien();
+    if (selected) {
+      this.maintenanceService.updateEntretien(selected.id, entretien);
+    } else {
+      this.maintenanceService.addEntretien(entretien);
+    }
+    this.isFormOpen.set(false);
   }
 
   handleDelete(id: number): void {
@@ -97,5 +165,19 @@ export class MaintenanceComponent {
 
   trackById(index: number, item: any): number {
     return item.id;
+  }
+
+  private createEmptyForm(): Partial<Entretien> {
+    return {
+      vehiculeId: undefined,
+      type: 'vidange',
+      titre: '',
+      description: '',
+      datePlanifiee: new Date(),
+      statut: 'planifie',
+      coutEstime: 0,
+      kilometrageVehicule: 0,
+      urgence: 'moyenne'
+    };
   }
 }

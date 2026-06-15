@@ -1,0 +1,100 @@
+<div class="parametres-container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">Paramètres</h1>
+      <p class="text-muted mb-0">Configuration générale de l'application</p>
+    </div>
+    <button class="btn btn-outline-primary" (click)="appliquerParametresGeneraux()">
+      <i class="bi bi-sliders me-1"></i> Initialiser la configuration
+    </button>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="text-muted small">Total paramètres</div>
+          <div class="h3 fw-bold mb-0">{{ stats().total }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="text-muted small">Catégories</div>
+          <div class="h3 fw-bold mb-0">{{ stats().categories }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0 fw-bold">{{ editionId() ? 'Modifier' : 'Ajouter' }} un paramètre</h5>
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="handleSubmit()">
+            <div class="mb-3">
+              <label class="form-label">Clé</label>
+              <input class="form-control" [ngModel]="form().cleParametre" (ngModelChange)="updateField('cleParametre', $event)" name="cleParametre" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Valeur</label>
+              <input class="form-control" [ngModel]="form().valeur" (ngModelChange)="updateField('valeur', $event)" name="valeur" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Catégorie</label>
+              <input class="form-control" [ngModel]="form().categorie" (ngModelChange)="updateField('categorie', $event)" name="categorie">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              <textarea class="form-control" rows="3" [ngModel]="form().description" (ngModelChange)="updateField('description', $event)" name="description"></textarea>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary" type="submit">
+                <i class="bi bi-check-lg me-1"></i>{{ editionId() ? 'Enregistrer' : 'Ajouter' }}
+              </button>
+              <button class="btn btn-outline-secondary" type="button" (click)="resetForm()">Annuler</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <input class="form-control" placeholder="Rechercher..." [(ngModel)]="searchQuery">
+        </div>
+        <div class="list-group list-group-flush">
+          @for (parametre of parametres(); track parametre.id) {
+            <div class="list-group-item p-3">
+              <div class="d-flex justify-content-between gap-3">
+                <div>
+                  <div class="fw-bold">{{ parametre.cleParametre }}</div>
+                  <div class="text-muted small">{{ parametre.categorie || 'general' }}</div>
+                  <div>{{ parametre.valeur }}</div>
+                  @if (parametre.description) {
+                    <div class="text-muted small mt-1">{{ parametre.description }}</div>
+                  }
+                </div>
+                <div class="d-flex gap-2 align-items-start">
+                  <button class="btn btn-sm btn-outline-primary" (click)="handleEdit(parametre)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="handleDelete(parametre.id)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <div class="text-center text-muted py-5">Aucun paramètre trouvé</div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

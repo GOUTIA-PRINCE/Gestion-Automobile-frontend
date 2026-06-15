@@ -4,6 +4,8 @@ export interface Entretien {
   vehiculeImmatriculation: string;
   vehiculeMarque: string;
   vehiculeModele: string;
+  maintenancierId?: number;
+  maintenancierNom?: string;
   type: 'vidange' | 'revision' | 'reparation' | 'pneus' | 'autre';
   titre: string;
   description: string;

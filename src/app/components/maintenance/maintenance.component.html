@@ -239,6 +239,12 @@
                         <span class="fw-medium">{{ entretien.fournisseur || 'Non spécifié' }}</span>
                       </div>
                     </div>
+                    <div class="col-12 col-md-6">
+                      <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-person-gear text-primary"></i>
+                        <span class="fw-medium">{{ entretien.maintenancierNom || 'Maintenancier non lie' }}</span>
+                      </div>
+                    </div>
                   </div>
 
                   <!-- Prochain entretien -->
@@ -342,13 +348,83 @@
         </div>
         <div class="modal-body">
           <!-- Formulaire simplifié pour l'exemple -->
-          <p>Formulaire d'ajout/modification d'entretien ici...</p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Vehicule</label>
+              <select class="form-select" name="vehiculeId" [(ngModel)]="formData.vehiculeId">
+                <option [ngValue]="undefined">Selectionner</option>
+                <option *ngFor="let v of vehicules()" [ngValue]="v.id">
+                  {{ v.marque }} {{ v.modele }} - {{ v.immatriculation }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Type</label>
+              <select class="form-select" name="type" [(ngModel)]="formData.type">
+                <option value="vidange">Vidange</option>
+                <option value="revision">Revision</option>
+                <option value="reparation">Reparation</option>
+                <option value="pneus">Pneus</option>
+                <option value="autre">Autre</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Titre</label>
+              <input class="form-control" name="titre" [(ngModel)]="formData.titre">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Maintenancier lie</label>
+              <select class="form-select" name="maintenancierId" [(ngModel)]="formData.maintenancierId">
+                <option [ngValue]="undefined">Aucun</option>
+                <option *ngFor="let m of maintenanciers()" [ngValue]="m.id">
+                  {{ m.prenom }} {{ m.nom }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Date planifiee</label>
+              <input type="date" class="form-control" name="datePlanifiee" [(ngModel)]="formData.datePlanifiee">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description</label>
+              <textarea class="form-control" rows="2" name="description" [(ngModel)]="formData.description"></textarea>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Statut</label>
+              <select class="form-select" name="statut" [(ngModel)]="formData.statut">
+                <option value="planifie">Planifie</option>
+                <option value="en_cours">En cours</option>
+                <option value="termine">Termine</option>
+                <option value="annule">Annule</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Urgence</label>
+              <select class="form-select" name="urgence" [(ngModel)]="formData.urgence">
+                <option value="faible">Faible</option>
+                <option value="moyenne">Moyenne</option>
+                <option value="elevee">Elevee</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Cout estime</label>
+              <input type="number" class="form-control" name="coutEstime" [(ngModel)]="formData.coutEstime">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Kilometrage</label>
+              <input type="number" class="form-control" name="kilometrageVehicule" [(ngModel)]="formData.kilometrageVehicule">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Fournisseur</label>
+              <input class="form-control" name="fournisseur" [(ngModel)]="formData.fournisseur">
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="isFormOpen.set(false)">
             Annuler
           </button>
-          <button type="button" class="btn btn-primary">
+          <button type="button" class="btn btn-primary" (click)="handleSubmit()">
             {{ selectedEntretien() ? 'Modifier' : 'Planifier' }}
           </button>
         </div>

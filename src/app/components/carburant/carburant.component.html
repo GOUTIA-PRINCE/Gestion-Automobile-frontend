@@ -180,6 +180,7 @@
               <th>Coût</th>
               <th>Station</th>
               <th>Kilométrage</th>
+              <th>Chauffeur</th>
               <th class="text-end pe-4">Actions</th>
             </tr>
           </thead>
@@ -214,6 +215,9 @@
               </td>
               <td>
                 <div class="fw-medium">{{ plein.kilometrage.toLocaleString('fr-FR') }} km</div>
+              </td>
+              <td>
+                <div class="fw-medium">{{ plein.chauffeurNom || 'Non lie' }}</div>
               </td>
               <td class="text-end pe-4">
                 <div class="d-flex justify-content-end gap-2">
@@ -251,13 +255,60 @@
         </div>
         <div class="modal-body">
           <!-- Formulaire simplifié pour l'exemple -->
-          <p>Formulaire d'ajout/modification de plein ici...</p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Vehicule</label>
+              <select class="form-select" name="vehiculeId" [(ngModel)]="formData.vehiculeId">
+                <option [ngValue]="undefined">Selectionner</option>
+                <option *ngFor="let v of vehicules()" [ngValue]="v.id">
+                  {{ v.marque }} {{ v.modele }} - {{ v.immatriculation }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-control" name="date" [(ngModel)]="formData.date">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Quantite (L)</label>
+              <input type="number" class="form-control" name="quantite" [(ngModel)]="formData.quantite">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Prix / litre</label>
+              <input type="number" class="form-control" name="prixParLitre" [(ngModel)]="formData.prixParLitre">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Kilometrage</label>
+              <input type="number" class="form-control" name="kilometrage" [(ngModel)]="formData.kilometrage">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Chauffeur lie</label>
+              <select class="form-select" name="chauffeurId" [(ngModel)]="formData.chauffeurId">
+                <option [ngValue]="undefined">Aucun</option>
+                <option *ngFor="let c of chauffeurs()" [ngValue]="c.id">
+                  {{ c.prenom }} {{ c.nom }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Station</label>
+              <input class="form-control" name="station" [(ngModel)]="formData.station">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Type carburant</label>
+              <select class="form-select" name="typeCarburant" [(ngModel)]="formData.typeCarburant">
+                <option value="Diesel">Diesel</option>
+                <option value="Essence">Essence</option>
+                <option value="GPL">GPL</option>
+              </select>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" (click)="isFormOpen.set(false)">
             Annuler
           </button>
-          <button type="button" class="btn btn-primary">
+          <button type="button" class="btn btn-primary" (click)="handleSubmit()">
             {{ selectedPlein() ? 'Modifier' : 'Ajouter' }}
           </button>
         </div>

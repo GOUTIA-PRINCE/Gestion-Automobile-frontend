@@ -1,0 +1,98 @@
+<div class="admin-container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-0 fw-bold">Administration</h2>
+      <p class="text-muted mb-0">Gestion des utilisateurs du parc</p>
+    </div>
+    <button class="btn btn-primary" (click)="handleAdd()">
+      <i class="bi bi-person-plus me-1"></i> Nouvel utilisateur
+    </button>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Total</div><div class="h3 fw-bold">{{ stats().total }}</div></div></div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Actifs</div><div class="h3 fw-bold text-success">{{ stats().actifs }}</div></div></div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Administrateurs</div><div class="h3 fw-bold text-primary">{{ stats().admins }}</div></div></div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4">Utilisateur</th>
+            <th>Type</th>
+            <th>Statut</th>
+            <th>Telephone</th>
+            <th class="text-end pe-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of utilisateurs()">
+            <td class="ps-4">
+              <div class="fw-bold">{{ user.prenom }} {{ user.nom }}</div>
+              <div class="text-muted small">{{ user.email }}</div>
+            </td>
+            <td><span class="badge bg-primary-subtle text-primary">{{ user.typeUtilisateur }}</span></td>
+            <td><span class="badge" [ngClass]="user.statut === 'ACTIF' ? 'bg-success' : 'bg-secondary'">{{ user.statut }}</span></td>
+            <td>{{ user.telephone || '-' }}</td>
+            <td class="text-end pe-4">
+              <button class="btn btn-sm btn-outline-danger" (click)="handleDelete(user.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="isFormOpen()" class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Créer un utilisateur</h5>
+          <button type="button" class="btn-close" (click)="isFormOpen.set(false)"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Type</label>
+              <select class="form-select" name="typeUtilisateur" [(ngModel)]="formData.typeUtilisateur">
+                <option value="ADMINISTRATEUR">Administrateur</option>
+                <option value="GESTIONNAIRE">Gestionnaire</option>
+                <option value="CHAUFFEUR">Chauffeur</option>
+                <option value="MAINTENANCIER">Maintenancier</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Statut</label>
+              <select class="form-select" name="statut" [(ngModel)]="formData.statut">
+                <option value="ACTIF">Actif</option>
+                <option value="INACTIF">Inactif</option>
+              </select>
+            </div>
+            <div class="col-md-6"><label class="form-label">Prenom</label><input class="form-control" name="prenom" [(ngModel)]="formData.prenom"></div>
+            <div class="col-md-6"><label class="form-label">Nom</label><input class="form-control" name="nom" [(ngModel)]="formData.nom"></div>
+            <div class="col-md-6"><label class="form-label">Email</label><input type="email" class="form-control" name="email" [(ngModel)]="formData.email"></div>
+            <div class="col-md-6"><label class="form-label">Mot de passe</label><input type="password" class="form-control" name="password" [(ngModel)]="formData.password"></div>
+            <div class="col-md-6"><label class="form-label">Telephone</label><input class="form-control" name="telephone" [(ngModel)]="formData.telephone"></div>
+            <div class="col-md-6"><label class="form-label">Site</label><input class="form-control" name="site" [(ngModel)]="formData.site"></div>
+            <div class="col-12"><label class="form-label">Adresse</label><input class="form-control" name="adresse" [(ngModel)]="formData.adresse"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" (click)="isFormOpen.set(false)">Annuler</button>
+          <button class="btn btn-primary" type="button" (click)="handleSubmit()">Créer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="isFormOpen()" class="modal-backdrop fade show"></div>
+</div>

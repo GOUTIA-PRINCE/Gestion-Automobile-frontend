@@ -366,13 +366,99 @@
             <button type="button" class="btn-close" (click)="isUploadOpen.set(false)"></button>
           </div>
           <div class="modal-body">
-            <p>Formulaire d'upload de document ici...</p>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Type</label>
+                <select class="form-select" name="type" [(ngModel)]="formData.type">
+                  <option value="assurance">Assurance</option>
+                  <option value="carte_grise">Carte grise</option>
+                  <option value="contrat">Contrat</option>
+                  <option value="facture">Facture</option>
+                  <option value="maintenance">Maintenance</option>
+                  <option value="permis">Permis</option>
+                  <option value="autre">Autre</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Categorie</label>
+                <select class="form-select" name="categorie" [(ngModel)]="formData.categorie">
+                  <option value="vehicule">Vehicule</option>
+                  <option value="chauffeur">Chauffeur</option>
+                  <option value="administratif">Administratif</option>
+                  <option value="financier">Financier</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Titre</label>
+                <input class="form-control" name="titre" [(ngModel)]="formData.titre">
+              </div>
+              <div class="col-12">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" rows="2" name="description" [(ngModel)]="formData.description"></textarea>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Vehicule lie</label>
+                <select class="form-select" name="vehiculeId" [(ngModel)]="formData.vehiculeId">
+                  <option [ngValue]="undefined">Aucun</option>
+                  <option *ngFor="let v of vehicules()" [ngValue]="v.id">
+                    {{ v.marque }} {{ v.modele }} - {{ v.immatriculation }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Chauffeur lie</label>
+                <select class="form-select" name="chauffeurId" [(ngModel)]="formData.chauffeurId">
+                  <option [ngValue]="undefined">Aucun</option>
+                  <option *ngFor="let c of chauffeurs()" [ngValue]="c.id">
+                    {{ c.prenom }} {{ c.nom }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Date creation</label>
+                <input type="date" class="form-control" name="dateCreation" [(ngModel)]="formData.dateCreation">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Date expiration</label>
+                <input type="date" class="form-control" name="dateExpiration" [(ngModel)]="formData.dateExpiration">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Extension</label>
+                <input class="form-control" name="extension" [(ngModel)]="formData.extension">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Taille (Ko)</label>
+                <input type="number" class="form-control" name="taille" [(ngModel)]="formData.taille">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Statut</label>
+                <select class="form-select" name="statut" [(ngModel)]="formData.statut">
+                  <option value="valide">Valide</option>
+                  <option value="expirant">Expirant</option>
+                  <option value="expire">Expire</option>
+                  <option value="invalide">Invalide</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Fichier</label>
+                <input type="file" class="form-control" (change)="onFileSelected($event)">
+                @if (formData.nomFichier) {
+                  <div class="small text-muted mt-2">
+                    {{ formData.nomFichier }} - {{ formData.taille || 0 }} Ko
+                  </div>
+                }
+              </div>
+              <div class="col-12">
+                <label class="form-label">Tags</label>
+                <input class="form-control" name="tagsText" [(ngModel)]="formData.tagsText" placeholder="assurance, 2026">
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" (click)="isUploadOpen.set(false)">
               Annuler
             </button>
-            <button type="button" class="btn btn-primary">
+            <button type="button" class="btn btn-primary" (click)="handleSubmit()">
               Enregistrer
             </button>
           </div>
