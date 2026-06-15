@@ -3,6 +3,8 @@ import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Vehicules } from '../../Modeles/vehicules';
 import { VehiculesService } from '../../services/vehicules.service';
+import { ChauffeurService } from '../../services/chauffeur.service';
+import { Chauffeur } from '../../Modeles/chauffeur';
 // import { HttpClientModule } from '@angular/common/http';
 
 @Component({
@@ -19,11 +21,13 @@ import { VehiculesService } from '../../services/vehicules.service';
 export class VehiculesComponent implements OnInit {
 
   private vehiculesService = inject(VehiculesService);
+  private chauffeurService = inject(ChauffeurService);
 
   // Utiliser les signals du service (comme dans chauffeurs)
   vehicles = this.vehiculesService.vehicules;
   filteredVehicles = this.vehiculesService.filteredVehicules;
   stats = this.vehiculesService.stats;
+  chauffeurs = signal<Chauffeur[]>([]);
 
   // Propriété intermédiaire pour searchQuery (améliore la réactivité avec ngModel)
   get searchQuery(): string {
@@ -37,6 +41,10 @@ export class VehiculesComponent implements OnInit {
   //methode pour initialiser le composant et charger les données des véhicules depuis l'API
   ngOnInit(): void {
     this.vehiculesService.loadVehicules();
+    this.chauffeurService.getChauffeurs().subscribe({
+      next: chauffeurs => this.chauffeurs.set(chauffeurs),
+      error: err => console.error('Erreur chargement chauffeurs', err)
+    });
   }
 
   // Autres signaux pour gérer l'état de l'interface
@@ -75,13 +83,18 @@ export class VehiculesComponent implements OnInit {
     if (this.selectedVehicle()) {
       // Modification d'un véhicule existant
       const id = this.selectedVehicle()!.id;
-      this.vehiculesService.updateVehicule(id, { ...(this.formData as Vehicules), id });
+      this.vehiculesService.updateVehicule(id, { ...(this.formData as Vehicules), id }).subscribe({
+        next: () => this.closeForm(),
+        error: err => console.error('Erreur modification vehicule', err)
+      });
     } else {
       // Ajout d'un nouveau véhicule
-      this.vehiculesService.addVehicule(this.formData as Omit<Vehicules, 'id'>);
+      this.vehiculesService.addVehicule(this.formData as Omit<Vehicules, 'id'>).subscribe({
+        next: () => this.closeForm(),
+        error: err => console.error('Erreur ajout vehicule', err)
+      });
     }
 
-    this.closeForm();
   }
 
   // Méthode pour fermer le formulaire
@@ -100,7 +113,9 @@ export class VehiculesComponent implements OnInit {
       annee: new Date().getFullYear(),
       typeVehicule: 'Break',
       kilometrage: 0,
-      statut: 'actif'
+      statut: 'actif',
+      chauffeurId: undefined,
+      chauffeurNom: undefined
     };
   }
 

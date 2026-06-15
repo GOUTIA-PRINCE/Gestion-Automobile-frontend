@@ -167,7 +167,11 @@
                   <div>
                     <h6 class="fw-bold mb-1">{{ alerte.titre }}</h6>
                     <div class="text-muted small">
-                      {{ alerte.vehiculeMarque }} {{ alerte.vehiculeModele }} • {{ alerte.vehiculeImmatriculation }}
+                      @if (alerte.vehiculeMarque || alerte.vehiculeImmatriculation) {
+                        {{ alerte.vehiculeMarque }} {{ alerte.vehiculeModele }} • {{ alerte.vehiculeImmatriculation }}
+                      } @else {
+                        {{ alerte.chauffeurNom || 'Aucun vehicule lie' }}
+                      }
                     </div>
                   </div>
                   <div class="d-flex gap-2">

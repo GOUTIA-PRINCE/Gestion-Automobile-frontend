@@ -1,12 +1,14 @@
 export interface Alerte {
   id: number;
-  type: 'assurance' | 'revision' | 'carte_grise' | 'vidange' | 'entretien' | 'pneu' | 'controle_technique' | 'autre';
+  type: 'assurance' | 'revision' | 'carte_grise' | 'vidange' | 'entretien' | 'pneu' | 'controle_technique' | 'permis' | 'autre';
   titre: string;
   description: string;
-  vehiculeId: number;
-  vehiculeMarque: string;
-  vehiculeModele: string;
-  vehiculeImmatriculation: string;
+  vehiculeId?: number;
+  vehiculeMarque?: string;
+  vehiculeModele?: string;
+  vehiculeImmatriculation?: string;
+  chauffeurId?: number;
+  chauffeurNom?: string;
   dateCreation: Date;
   dateEcheance?: Date;
   statut: 'active' | 'resolue' | 'expiree';

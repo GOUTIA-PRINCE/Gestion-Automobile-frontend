@@ -44,7 +44,8 @@ export class AlerteService {
         a.description?.toLowerCase().includes(query) ||
         a.vehiculeMarque?.toLowerCase().includes(query) ||
         a.vehiculeModele?.toLowerCase().includes(query) ||
-        a.vehiculeImmatriculation?.toLowerCase().includes(query)
+        a.vehiculeImmatriculation?.toLowerCase().includes(query) ||
+        a.chauffeurNom?.toLowerCase().includes(query)
       );
     }
 

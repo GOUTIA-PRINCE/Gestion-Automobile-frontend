@@ -196,9 +196,7 @@
                 <i class="bi bi-person text-muted"></i>
               </div>
               <div class="fw-medium">
-                {{ v.marque === 'Toyota' ? 'Jean-Pierre Nguema' : 
-                   v.marque === 'Mitsubishi' ? 'Marie Fotso' : 
-                   'Aucun chauffeur' }}
+                {{ v.chauffeurNom || 'Aucun chauffeur' }}
               </div>
             </div>
           </div>
@@ -329,6 +327,19 @@
             </div>
           </div>
 
+              <div class="col-12">
+                <label class="form-label">Chauffeur assigné</label>
+                <select
+                  name="chauffeurId"
+                  class="form-select"
+                  [(ngModel)]="formData.chauffeurId"
+                >
+                  <option [ngValue]="undefined">Aucun chauffeur</option>
+                  <option *ngFor="let chauffeur of chauffeurs()" [ngValue]="chauffeur.id">
+                    {{ chauffeur.prenom }} {{ chauffeur.nom }}
+                  </option>
+                </select>
+              </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" (click)="closeForm()">
               Annuler

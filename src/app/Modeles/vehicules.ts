@@ -8,4 +8,6 @@ export interface Vehicules {
   typeVehicule: string;
   statut: 'actif' | 'en_maintenance' | 'en_panne' | 'retire';
   kilometrage: number;
+  chauffeurId?: number;
+  chauffeurNom?: string;
 }

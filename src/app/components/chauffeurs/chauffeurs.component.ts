@@ -68,9 +68,12 @@ export class ChauffeursComponent implements OnInit {
   
   canManage = true;
 
-  availableVehicules = computed(() => 
-    this.vehicules().filter(v => v.statut === 'actif')
-  );
+  availableVehicules = computed(() => {
+    const selectedId = this.selectedChauffeur()?.id;
+    return this.vehicules().filter(v =>
+      v.statut === 'actif' && (!v.chauffeurId || v.chauffeurId === selectedId)
+    );
+  });
 
   // ─── Données du formulaire ──────────────────────────────────────────────
   formData: FormData = this.createEmptyForm();
@@ -117,10 +120,16 @@ export class ChauffeursComponent implements OnInit {
    */
   handleEdit(chauffeur: Chauffeur): void {
     this.selectedChauffeur.set(chauffeur);
+    const vehiculeAttribue = this.vehicules().find(v => v.chauffeurId === chauffeur.id);
     this.formData = {
       ...chauffeur,
-      vehiculeAttribue: chauffeur.vehiculeAttribue 
-        ? { ...chauffeur.vehiculeAttribue } 
+      vehiculeAttribue: vehiculeAttribue
+        ? {
+            id: vehiculeAttribue.id,
+            marque: vehiculeAttribue.marque,
+            modele: vehiculeAttribue.modele,
+            immatriculation: vehiculeAttribue.immatriculation
+          }
         : { id: undefined, marque: '', modele: '', immatriculation: '' }
     };
     this.currentStep.set('photo');
@@ -134,7 +143,7 @@ export class ChauffeursComponent implements OnInit {
   handleDelete(id: number): void {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce chauffeur ?')) {
       this.chauffeurService.deleteChauffeur(id).subscribe({
-        next: () => {
+        next: (chauffeur) => {
           console.log('Chauffeur supprimé avec succès');
         },
         error: (err) => {
@@ -323,8 +332,9 @@ export class ChauffeursComponent implements OnInit {
     if (this.selectedChauffeur()) {
       const id = this.selectedChauffeur()!.id;
       this.chauffeurService.updateChauffeur(id, chauffeurData as Chauffeur).subscribe({
-        next: () => {
+        next: (chauffeur) => {
           console.log('Chauffeur mis à jour avec succès');
+          this.syncVehiculeAffectation(chauffeur);
           this.closeForm();
         },
         error: (err) => {
@@ -334,8 +344,9 @@ export class ChauffeursComponent implements OnInit {
       });
     } else {
       this.chauffeurService.addChauffeur(chauffeurData).subscribe({
-        next: () => {
+        next: (chauffeur) => {
           console.log('Chauffeur créé avec succès');
+          this.syncVehiculeAffectation(chauffeur);
           this.closeForm();
         },
         error: (err) => {
@@ -349,6 +360,26 @@ export class ChauffeursComponent implements OnInit {
   /**
    * Gère la sélection d'un véhicule dans le formulaire
    */
+  private syncVehiculeAffectation(chauffeur: Chauffeur): void {
+    const vehiculeId = this.formData.vehiculeAttribue?.id;
+    if (!vehiculeId) {
+      return;
+    }
+
+    const vehicule = this.vehicules().find(v => v.id === vehiculeId);
+    if (!vehicule) {
+      return;
+    }
+
+    this.vehiculesService.updateVehicule(vehiculeId, {
+      ...vehicule,
+      chauffeurId: chauffeur.id
+    }).subscribe({
+      next: updated => this.vehicules.update(list => list.map(v => v.id === updated.id ? updated : v)),
+      error: err => console.error('Erreur attribution vehicule', err)
+    });
+  }
+
   onVehiculeSelect(id?: number | string): void {
     const vehiculeId = Number(id);
 

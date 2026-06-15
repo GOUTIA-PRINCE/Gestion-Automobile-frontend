@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, signal, computed } from '@angular/core';
 import { Vehicules } from '../Modeles/vehicules';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -59,18 +60,18 @@ export class VehiculesService {
 
   // CRUD operations
 
-  addVehicule(vehicule: Omit<Vehicules, 'id'>) {
-    return this.http.post<Vehicules>(this.apiUrl, vehicule).subscribe(newVehicule => {
-      this.vehicules.update(list => [...list, newVehicule]);
-    });
+  addVehicule(vehicule: Omit<Vehicules, 'id'>): Observable<Vehicules> {
+    return this.http.post<Vehicules>(this.apiUrl, vehicule).pipe(
+      tap(newVehicule => this.vehicules.update(list => [...list, newVehicule]))
+    );
   }
 
-  updateVehicule(id: number, vehicule: Vehicules) {
-    return this.http.put<Vehicules>(`${this.apiUrl}/${id}`, vehicule).subscribe(updated => {
-      this.vehicules.update(list =>
+  updateVehicule(id: number, vehicule: Partial<Vehicules>): Observable<Vehicules> {
+    return this.http.put<Vehicules>(`${this.apiUrl}/${id}`, vehicule).pipe(
+      tap(updated => this.vehicules.update(list =>
         list.map(v => v.id === id ? updated : v)
-      );
-    });
+      ))
+    );
   }
 
   deleteVehicule(id: number) {

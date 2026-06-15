@@ -79,6 +79,7 @@ export class AlertesComponent {
       'entretien': 'bi-wrench',
       'pneu': 'bi-circle',
       'controle_technique': 'bi-clipboard-check',
+      'permis': 'bi-person-badge',
       'autre': 'bi-exclamation-triangle'
     };
     return icons[type] || 'bi-exclamation-triangle';
@@ -93,6 +94,7 @@ export class AlertesComponent {
       'entretien': 'Entretien',
       'pneu': 'Pneus',
       'controle_technique': 'Contrôle technique',
+      'permis': 'Permis',
       'autre': 'Autre'
     };
     return labels[type] || type;
