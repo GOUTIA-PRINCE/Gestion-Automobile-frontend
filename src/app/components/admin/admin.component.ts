@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Utilisateur } from '../../Modeles/utilisateur';
 import { UtilisateurService } from '../../services/utilisateur.service';
@@ -10,10 +10,12 @@ import { UtilisateurService } from '../../services/utilisateur.service';
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
-export class AdminComponent {
+export class AdminComponent implements OnInit {
   private utilisateurService = inject(UtilisateurService);
 
   utilisateurs = this.utilisateurService.utilisateurs;
+  isLoading = this.utilisateurService.isLoading;
+  error = this.utilisateurService.error;
   isFormOpen = signal(false);
   selectedUser = signal<Utilisateur | null>(null);
   formData: Omit<Utilisateur, 'id'> = this.createEmptyForm();
@@ -36,12 +38,23 @@ export class AdminComponent {
     { code: 'admin:read', label: 'Voir administration' },
     { code: 'admin:write', label: 'Gerer utilisateurs' }
   ];
+  categoriesPermis = [
+    { value: 'A', label: 'A - Motos' },
+    { value: 'B', label: 'B - Voitures' },
+    { value: 'C', label: 'C - Poids lourds' },
+    { value: 'D', label: 'D - Transport de personnes' },
+    { value: 'E', label: 'E - Remorque' }
+  ];
 
   stats = computed(() => ({
     total: this.utilisateurs().length,
     actifs: this.utilisateurs().filter(u => u.statut === 'ACTIF').length,
     admins: this.utilisateurs().filter(u => u.typeUtilisateur === 'ADMINISTRATEUR').length
   }));
+
+  ngOnInit(): void {
+    this.utilisateurService.loadUtilisateurs();
+  }
 
   handleAdd(): void {
     this.selectedUser.set(null);
@@ -135,6 +148,9 @@ export class AdminComponent {
       statut: 'ACTIF',
       adresse: '',
       site: '',
+      numeroPermis: '',
+      categoriePermis: '',
+      dateExpirationPermis: '',
       permissions: []
     };
   }

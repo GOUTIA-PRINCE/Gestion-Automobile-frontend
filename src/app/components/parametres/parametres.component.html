@@ -1,99 +1,129 @@
 <div class="parametres-container">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h1 class="h3 fw-bold mb-1">Paramètres</h1>
-      <p class="text-muted mb-0">Configuration générale de l'application</p>
+      <h1 class="h3 fw-bold mb-1">Parametres</h1>
+      <p class="text-muted mb-0">Configuration de votre espace de gestion du parc</p>
     </div>
     <button *ngIf="canWrite" class="btn btn-outline-primary" (click)="appliquerParametresGeneraux()">
-      <i class="bi bi-sliders me-1"></i> Initialiser la configuration
+      <i class="bi bi-sliders me-1"></i> Initialiser
     </button>
   </div>
 
-  <div class="row g-3 mb-4">
-    <div class="col-md-6">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="text-muted small">Total paramètres</div>
-          <div class="h3 fw-bold mb-0">{{ stats().total }}</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="text-muted small">Catégories</div>
-          <div class="h3 fw-bold mb-0">{{ stats().categories }}</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row g-4">
-    <div class="col-lg-5">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white">
-          <h5 class="mb-0 fw-bold">{{ editionId() ? 'Modifier' : 'Ajouter' }} un paramètre</h5>
-        </div>
-        <div class="card-body">
-          <form (ngSubmit)="handleSubmit()">
-            <div class="mb-3">
-              <label class="form-label">Clé</label>
-              <input class="form-control" [ngModel]="form().cleParametre" (ngModelChange)="updateField('cleParametre', $event)" name="cleParametre" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Valeur</label>
-              <input class="form-control" [ngModel]="form().valeur" (ngModelChange)="updateField('valeur', $event)" name="valeur" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Catégorie</label>
-              <input class="form-control" [ngModel]="form().categorie" (ngModelChange)="updateField('categorie', $event)" name="categorie">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Description</label>
-              <textarea class="form-control" rows="3" [ngModel]="form().description" (ngModelChange)="updateField('description', $event)" name="description"></textarea>
-            </div>
-            <div class="d-flex gap-2">
-              <button *ngIf="canWrite" class="btn btn-primary" type="submit">
-                <i class="bi bi-check-lg me-1"></i>{{ editionId() ? 'Enregistrer' : 'Ajouter' }}
-              </button>
-              <button class="btn btn-outline-secondary" type="button" (click)="resetForm()">Annuler</button>
-            </div>
-          </form>
-        </div>
-      </div>
+  <div class="settings-layout">
+    <div class="settings-menu">
+      <button
+        type="button"
+        class="settings-item"
+        *ngFor="let groupe of groupesParametres"
+        [class.active]="activeGroupe().id === groupe.id"
+        (click)="activeGroupe.set(groupe)"
+      >
+        <i class="bi" [ngClass]="groupe.icon"></i>
+        <span>
+          <strong>{{ groupe.titre }}</strong>
+          <small>{{ groupe.description }}</small>
+        </span>
+      </button>
     </div>
 
-    <div class="col-lg-7">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white">
-          <input class="form-control" placeholder="Rechercher..." [(ngModel)]="searchQuery">
+    <div class="settings-panel">
+      <div class="panel-header">
+        <div>
+          <h2>{{ activeGroupe().titre }}</h2>
+          <p>{{ activeGroupe().description }}</p>
         </div>
-        <div class="list-group list-group-flush">
-          @for (parametre of parametres(); track parametre.id) {
-            <div class="list-group-item p-3">
-              <div class="d-flex justify-content-between gap-3">
-                <div>
-                  <div class="fw-bold">{{ parametre.cleParametre }}</div>
-                  <div class="text-muted small">{{ parametre.categorie || 'general' }}</div>
-                  <div>{{ parametre.valeur }}</div>
-                  @if (parametre.description) {
-                    <div class="text-muted small mt-1">{{ parametre.description }}</div>
-                  }
-                </div>
-                <div class="d-flex gap-2 align-items-start">
-                  <button *ngIf="canWrite" class="btn btn-sm btn-outline-primary" (click)="handleEdit(parametre)">
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button *ngIf="canWrite" class="btn btn-sm btn-outline-danger" (click)="handleDelete(parametre.id)">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </div>
+        <span class="badge bg-primary-subtle text-primary">{{ stats().total }} parametres</span>
+      </div>
+
+      <div class="quick-settings">
+        <label class="setting-row">
+          <span>
+            <strong>Notifications d'alertes</strong>
+            <small>Afficher les rappels de documents, permis et maintenances.</small>
+          </span>
+          <input type="checkbox" class="form-check-input" checked [disabled]="!canWrite">
+        </label>
+        <label class="setting-row">
+          <span>
+            <strong>Mode sombre</strong>
+            <small>Utiliser une interface sombre lorsque le theme est active.</small>
+          </span>
+          <input type="checkbox" class="form-check-input" [disabled]="!canWrite">
+        </label>
+        <label class="setting-row">
+          <span>
+            <strong>Sessions securisees</strong>
+            <small>Limiter les actions sensibles aux utilisateurs autorises.</small>
+          </span>
+          <input type="checkbox" class="form-check-input" checked [disabled]="!canWrite">
+        </label>
+      </div>
+
+      <div class="param-editor mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h3 class="h6 fw-bold mb-0">{{ editionId() ? 'Modifier un parametre' : 'Ajouter un parametre' }}</h3>
+          <input class="form-control form-control-sm search-input" placeholder="Rechercher..." [(ngModel)]="searchQuery">
+        </div>
+
+        <form class="row g-3" (ngSubmit)="handleSubmit()">
+          <div class="col-md-6">
+            <label class="form-label">Cle</label>
+            <input class="form-control" [ngModel]="form().cleParametre" (ngModelChange)="updateField('cleParametre', $event)" name="cleParametre" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Valeur</label>
+            <input class="form-control" [ngModel]="form().valeur" (ngModelChange)="updateField('valeur', $event)" name="valeur" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Categorie</label>
+            <select class="form-select" [ngModel]="form().categorie" (ngModelChange)="updateField('categorie', $event)" name="categorie">
+              <option value="general">General</option>
+              <option value="profil">Profil</option>
+              <option value="compte">Compte</option>
+              <option value="confidentialite">Confidentialite</option>
+              <option value="alertes">Alertes</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="carburant">Carburant</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Description</label>
+            <input class="form-control" [ngModel]="form().description" (ngModelChange)="updateField('description', $event)" name="description">
+          </div>
+          <div class="col-12 d-flex gap-2">
+            <button *ngIf="canWrite" class="btn btn-primary" type="submit">
+              <i class="bi bi-check-lg me-1"></i>{{ editionId() ? 'Enregistrer' : 'Ajouter' }}
+            </button>
+            <button class="btn btn-outline-secondary" type="button" (click)="resetForm()">Annuler</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="list-group list-group-flush mt-4">
+        @for (parametre of parametres(); track parametre.id) {
+          <div class="list-group-item px-0">
+            <div class="d-flex justify-content-between gap-3">
+              <div>
+                <div class="fw-bold">{{ parametre.cleParametre }}</div>
+                <div class="text-muted small">{{ parametre.categorie || 'general' }}</div>
+                <div>{{ parametre.valeur }}</div>
+                @if (parametre.description) {
+                  <div class="text-muted small mt-1">{{ parametre.description }}</div>
+                }
+              </div>
+              <div class="d-flex gap-2 align-items-start">
+                <button *ngIf="canWrite" class="btn btn-sm btn-outline-primary" (click)="handleEdit(parametre)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button *ngIf="canWrite" class="btn btn-sm btn-outline-danger" (click)="handleDelete(parametre.id)">
+                  <i class="bi bi-trash"></i>
+                </button>
               </div>
             </div>
-          } @empty {
-            <div class="text-center text-muted py-5">Aucun paramètre trouvé</div>
-          }
-        </div>
+          </div>
+        } @empty {
+          <div class="text-center text-muted py-5">Aucun parametre trouve</div>
+        }
       </div>
     </div>
   </div>

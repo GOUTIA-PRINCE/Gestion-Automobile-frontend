@@ -18,6 +18,17 @@ export class ProfilComponent {
   showPassword = signal(false);
   message = signal<string | null>(null);
   formData: Partial<Utilisateur> = {};
+  readonly categoriesPermis = [
+    { value: 'A', label: 'A - Motos' },
+    { value: 'B', label: 'B - Voitures' },
+    { value: 'C', label: 'C - Poids lourds' },
+    { value: 'D', label: 'D - Transport de personnes' },
+    { value: 'E', label: 'E - Remorque' }
+  ];
+  readonly statuts = [
+    { value: 'ACTIF', label: 'Actif' },
+    { value: 'INACTIF', label: 'Inactif' }
+  ];
 
   constructor() {
     this.resetForm();

@@ -1,44 +1,57 @@
 <div class="login-page">
-  <div class="login-panel">
-    <div class="brand">
-      <div class="brand-icon">
-        <i class="bi bi-truck-front"></i>
+  <section class="login-hero">
+    <div class="hero-copy">
+      <div class="brand-mark">
+        <i class="bi bi-car-front-fill"></i>
       </div>
-      <div>
-        <h1>FleetPro</h1>
-        <p>Gestion de parc automobile</p>
-      </div>
+      <p class="eyebrow">Gestion de parc automobile</p>
+      <h1>Suivez vos vehicules, chauffeurs et entretiens depuis un seul espace.</h1>
+      <p class="hero-text">
+        Connectez-vous pour consulter les alertes, enregistrer les ravitaillements et piloter les operations du parc.
+      </p>
     </div>
 
-    <form (ngSubmit)="login()" class="login-form">
-      <div>
-        <label class="form-label">Email</label>
-        <input class="form-control" type="email" name="email" [(ngModel)]="email" autocomplete="email">
-      </div>
-
-      <div>
-        <label class="form-label">Mot de passe</label>
-        <div class="input-group">
-          <input class="form-control" [type]="showPassword() ? 'text' : 'password'" name="password" [(ngModel)]="password" autocomplete="current-password">
-          <button class="btn btn-outline-secondary" type="button" (click)="showPassword.set(!showPassword())">
-            <i class="bi" [ngClass]="showPassword() ? 'bi-eye-slash' : 'bi-eye'"></i>
-          </button>
+    <div class="login-panel">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="bi bi-car-front"></i>
         </div>
-        <button class="btn btn-link px-0 pt-2" type="button" (click)="openReset()">Mot de passe oublie ?</button>
+        <div>
+          <h2>FleetPro</h2>
+          <p>Acces securise</p>
+        </div>
       </div>
 
-      @if (error()) {
-        <div class="alert alert-danger py-2 mb-0">{{ error() }}</div>
-      }
+      <form (ngSubmit)="login()" class="login-form">
+        <div>
+          <label class="form-label">Email</label>
+          <input class="form-control" type="email" name="email" [(ngModel)]="email" autocomplete="email">
+        </div>
 
-      <button class="btn btn-primary w-100" type="submit" [disabled]="isLoading()">
-        @if (isLoading()) {
-          <span class="spinner-border spinner-border-sm me-2"></span>
+        <div>
+          <label class="form-label">Mot de passe</label>
+          <div class="input-group">
+            <input class="form-control" [type]="showPassword() ? 'text' : 'password'" name="password" [(ngModel)]="password" autocomplete="current-password">
+            <button class="btn btn-outline-secondary" type="button" (click)="showPassword.set(!showPassword())">
+              <i class="bi" [ngClass]="showPassword() ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </button>
+          </div>
+          <button class="btn btn-link px-0 pt-2" type="button" (click)="openReset()">Mot de passe oublie ?</button>
+        </div>
+
+        @if (error()) {
+          <div class="alert alert-danger py-2 mb-0">{{ error() }}</div>
         }
-        Se connecter
-      </button>
-    </form>
-  </div>
+
+        <button class="btn btn-primary w-100" type="submit" [disabled]="isLoading()">
+          @if (isLoading()) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+          }
+          Se connecter
+        </button>
+      </form>
+    </div>
+  </section>
 </div>
 
 @if (isResetOpen()) {

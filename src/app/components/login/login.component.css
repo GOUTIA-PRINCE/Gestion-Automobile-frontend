@@ -2,17 +2,73 @@
   min-height: 100vh;
   display: grid;
   place-items: center;
-  background: #f4f7fb;
-  padding: 24px;
+  background:
+    linear-gradient(90deg, rgba(2, 6, 23, 0.72), rgba(15, 23, 42, 0.28)),
+    url("https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1800&q=82") center/cover;
+  padding: 32px;
+}
+
+.login-hero {
+  width: min(1120px, 100%);
+  min-height: 640px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 430px;
+  align-items: center;
+  gap: 48px;
+}
+
+.hero-copy {
+  color: #fff;
+  max-width: 640px;
+  text-shadow: 0 2px 18px rgba(2, 6, 23, 0.38);
+}
+
+.brand-mark {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  font-size: 28px;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #bfdbfe;
+}
+
+.hero-copy h1 {
+  margin: 0;
+  max-width: 620px;
+  font-size: 48px;
+  line-height: 1.08;
+  font-weight: 800;
+}
+
+.hero-text {
+  max-width: 540px;
+  margin: 22px 0 0;
+  color: #e5eefc;
+  font-size: 18px;
+  line-height: 1.65;
 }
 
 .login-panel {
-  width: min(430px, 100%);
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(226, 232, 240, 0.9);
   border-radius: 8px;
   padding: 32px;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 24px 60px rgba(2, 6, 23, 0.24);
+  backdrop-filter: blur(10px);
 }
 
 .brand {
@@ -33,7 +89,7 @@
   font-size: 24px;
 }
 
-.brand h1 {
+.brand h2 {
   font-size: 28px;
   line-height: 1;
   margin: 0 0 4px;
@@ -47,4 +103,39 @@
 .login-form {
   display: grid;
   gap: 18px;
+}
+
+@media (max-width: 900px) {
+  .login-page {
+    align-items: start;
+    padding: 24px;
+  }
+
+  .login-hero {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .hero-copy h1 {
+    font-size: 34px;
+  }
+
+  .hero-text {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .login-page {
+    padding: 18px;
+  }
+
+  .hero-copy h1 {
+    font-size: 28px;
+  }
+
+  .login-panel {
+    padding: 24px;
+  }
 }

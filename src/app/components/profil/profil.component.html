@@ -41,7 +41,9 @@
             </div>
             <div class="col-md-6">
               <label class="form-label">Statut</label>
-              <input class="form-control" [value]="user.statut" disabled>
+              <select class="form-select" [(ngModel)]="formData.statut" [disabled]="!isEditing()">
+                <option *ngFor="let statut of statuts" [value]="statut.value">{{ statut.label }}</option>
+              </select>
             </div>
           </div>
         }
@@ -66,7 +68,14 @@
             </div>
             <div class="col-md-6" *ngIf="user.typeUtilisateur === 'CHAUFFEUR'">
               <label class="form-label">Categorie permis</label>
-              <input class="form-control" [(ngModel)]="formData.categoriePermis" [disabled]="!isEditing()">
+              <select class="form-select" [(ngModel)]="formData.categoriePermis" [disabled]="!isEditing()">
+                <option value="">Selectionner</option>
+                <option *ngFor="let categorie of categoriesPermis" [value]="categorie.value">{{ categorie.label }}</option>
+              </select>
+            </div>
+            <div class="col-md-6" *ngIf="user.typeUtilisateur === 'CHAUFFEUR'">
+              <label class="form-label">Date d'expiration du permis</label>
+              <input class="form-control" type="date" [(ngModel)]="formData.dateExpirationPermis" [disabled]="!isEditing()">
             </div>
           </div>
         }

@@ -15,9 +15,17 @@
       <i class="bi" [ngClass]="isDark ? 'bi-sun' : 'bi-moon'"></i>
     </button>
 
-    <div class="position-relative">
+    <a
+      *ngIf="auth.hasPermission('alertes:read')"
+      routerLink="/alertes"
+      class="notification-link"
+      aria-label="Voir les alertes"
+    >
       <i class="bi bi-bell fs-5"></i>
-    </div>
+      <span *ngIf="alertesActives() > 0" class="notification-badge">
+        {{ alertesActives() > 99 ? '99+' : alertesActives() }}
+      </span>
+    </a>
 
     <a routerLink="/profil" class="d-flex align-items-center gap-2 text-decoration-none text-dark" *ngIf="auth.currentUser() as user">
       <div class="rounded-circle bg-dark text-white px-2 py-1">{{ initials() }}</div>

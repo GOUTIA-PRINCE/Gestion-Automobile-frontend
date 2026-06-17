@@ -12,5 +12,6 @@ export interface Utilisateur {
   site?: string;
   numeroPermis?: string;
   categoriePermis?: string;
+  dateExpirationPermis?: string;
   permissions?: string[];
 }

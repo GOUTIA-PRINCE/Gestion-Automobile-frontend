@@ -10,15 +10,25 @@ export class UtilisateurService {
   private readonly apiUrl = 'http://localhost:8080/api/utilisateurs';
 
   utilisateurs = signal<Utilisateur[]>([]);
+  isLoading = signal(false);
+  error = signal<string | null>(null);
 
-  constructor(private http: HttpClient) {
-    this.loadUtilisateurs();
-  }
+  constructor(private http: HttpClient) {}
 
   loadUtilisateurs(): void {
+    this.isLoading.set(true);
+    this.error.set(null);
     this.http.get<Utilisateur[]>(this.apiUrl).subscribe({
-      next: data => this.utilisateurs.set(data),
-      error: err => console.error('Erreur chargement utilisateurs', err)
+      next: data => {
+        this.utilisateurs.set(data);
+        this.isLoading.set(false);
+      },
+      error: err => {
+        console.error('Erreur chargement utilisateurs', err);
+        this.utilisateurs.set([]);
+        this.error.set(err?.error?.message || err?.message || 'Impossible de charger les utilisateurs');
+        this.isLoading.set(false);
+      }
     });
   }
 

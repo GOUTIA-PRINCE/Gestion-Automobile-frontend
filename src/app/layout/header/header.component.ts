@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { AlerteService } from '../../services/alerte.service';
 
 @Component({
   selector: 'app-header',
@@ -9,10 +10,20 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   auth = inject(AuthService);
+  private alerteService = inject(AlerteService);
 
   isDark = false;
+  alertesActives = computed(() =>
+    this.alerteService.alertes().filter(alerte => alerte.statut === 'active').length
+  );
+
+  ngOnInit(): void {
+    if (this.auth.hasPermission('alertes:read')) {
+      this.alerteService.loadAlertes();
+    }
+  }
 
   toggleTheme() {
     this.isDark = !this.isDark;

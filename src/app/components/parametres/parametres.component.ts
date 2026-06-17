@@ -37,6 +37,45 @@ export class ParametresComponent {
     { cleParametre: 'alerte_expiration_documents_jours', valeur: '30', description: 'Delai avant alerte document expirant', categorie: 'alertes' },
     { cleParametre: 'maintenance_rappel_km', valeur: '5000', description: 'Intervalle kilometrique de rappel maintenance', categorie: 'maintenance' }
   ];
+  readonly groupesParametres = [
+    {
+      id: 'general',
+      icon: 'bi-laptop',
+      titre: 'General',
+      description: 'Demarrer, fermer et preferences de base'
+    },
+    {
+      id: 'profil',
+      icon: 'bi-person-circle',
+      titre: 'Profil',
+      description: 'Nom, photo de profil et informations personnelles'
+    },
+    {
+      id: 'compte',
+      icon: 'bi-key',
+      titre: 'Compte',
+      description: 'Notifications de securite, informations de compte'
+    },
+    {
+      id: 'confidentialite',
+      icon: 'bi-lock',
+      titre: 'Confidentialite',
+      description: 'Acces, droits utilisateurs et sessions'
+    },
+    {
+      id: 'discussions',
+      icon: 'bi-chat-square-text',
+      titre: 'Discussions',
+      description: 'Theme, affichage et preferences interface'
+    },
+    {
+      id: 'audio',
+      icon: 'bi-camera-video',
+      titre: 'Video et audio',
+      description: 'Camera, micro et haut-parleurs'
+    }
+  ];
+  activeGroupe = signal(this.groupesParametres[0]);
 
   get canWrite(): boolean {
     return this.authService.hasPermission('parametres:write');

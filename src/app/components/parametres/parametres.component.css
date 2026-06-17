@@ -2,10 +2,141 @@
   padding: 1.5rem;
 }
 
-.card {
-  border-radius: 8px;
+.settings-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
 }
 
-.list-group-item {
-  border-color: #eef2f7;
+.settings-menu {
+  display: grid;
+  gap: 6px;
+}
+
+.settings-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 16px 14px;
+  border-radius: 8px;
+  color: #111827;
+}
+
+.settings-item:hover,
+.settings-item.active {
+  background: #f1f5f9;
+}
+
+.settings-item i {
+  color: #6b7280;
+  font-size: 28px;
+  line-height: 1;
+  margin-top: 3px;
+}
+
+.settings-item strong {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.settings-item small {
+  display: block;
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.settings-panel {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: start;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.panel-header h2 {
+  margin: 0 0 4px;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.panel-header p {
+  margin: 0;
+  color: #64748b;
+}
+
+.quick-settings {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.setting-row strong,
+.setting-row small {
+  display: block;
+}
+
+.setting-row small {
+  color: #64748b;
+  margin-top: 3px;
+}
+
+.param-editor {
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.search-input {
+  max-width: 220px;
+}
+
+@media (max-width: 992px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .parametres-container {
+    padding: 1rem;
+  }
+
+  .panel-header,
+  .setting-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input {
+    max-width: none;
+  }
 }
