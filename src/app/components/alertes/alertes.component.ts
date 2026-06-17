@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AlerteService } from '../../services/alerte.service';
@@ -9,7 +9,7 @@ import { AlerteService } from '../../services/alerte.service';
   templateUrl: './alertes.component.html',
   styleUrl: './alertes.component.css'
 })
-export class AlertesComponent {
+export class AlertesComponent implements OnInit {
 
   private alerteService = inject(AlerteService);
 
@@ -41,6 +41,10 @@ export class AlertesComponent {
       count: alertes.filter(a => a.type === type).length
     }));
   });
+
+  ngOnInit(): void {
+    this.alerteService.loadAlertes();
+  }
 
   // Actions
   handleResoudre(id: number): void {

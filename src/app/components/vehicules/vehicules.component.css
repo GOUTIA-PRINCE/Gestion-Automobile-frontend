@@ -1,4 +1,19 @@
 /* vehicules.component.css */
+.maintenance-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #e0f2fe;
+  color: #075985;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.maintenance-note i {
+  font-size: 16px;
+}
 .vehicles-page {
   width: 100%;
 }

@@ -136,12 +136,14 @@
             class="badge px-3 py-2 fw-semibold"
             [ngClass]="{
               'bg-success': v.statut === 'actif',
+              'bg-info text-dark': v.statut === 'maintenance_planifiee',
               'bg-warning text-dark': v.statut === 'en_maintenance',
               'bg-danger': v.statut === 'en_panne',
               'bg-secondary': v.statut === 'retire'
             }"
           >
             {{ v.statut === 'actif' ? 'Actif' : 
+               v.statut === 'maintenance_planifiee' ? 'Maintenance planifiee' :
                v.statut === 'en_maintenance' ? 'En maintenance' : 
                v.statut === 'en_panne' ? 'En panne' : 
                'Retiré' }}
@@ -187,6 +189,11 @@
           
           <!-- Ligne séparatrice -->
           <hr class="my-3">
+
+          <div *ngIf="v.statut === 'maintenance_planifiee' || v.statut === 'en_maintenance'" class="maintenance-note mb-3">
+            <i class="bi" [ngClass]="v.statut === 'en_maintenance' ? 'bi-tools' : 'bi-calendar-check'"></i>
+            <span>{{ v.statut === 'en_maintenance' ? 'Vehicule actuellement en maintenance' : 'Maintenance planifiee pour ce vehicule' }}</span>
+          </div>
           
           <!-- Chauffeur assigné -->
           <div>
@@ -319,6 +326,7 @@
                   required
                 >
                   <option value="actif">Actif</option>
+                  <option value="maintenance_planifiee">Maintenance planifiee</option>
                   <option value="en_maintenance">En maintenance</option>
                   <option value="en_panne">En panne</option>
                   <option value="retire">Retiré</option>

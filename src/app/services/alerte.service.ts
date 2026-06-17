@@ -13,9 +13,7 @@ export class AlerteService {
   filtreStatut = signal<string>('tous');
   searchQuery = signal('');
 
-  constructor(private http: HttpClient) {
-    this.loadAlertes();
-  }
+  constructor(private http: HttpClient) {}
 
   loadAlertes(): void {
     this.http.get<Alerte[]>(this.apiUrl).subscribe({

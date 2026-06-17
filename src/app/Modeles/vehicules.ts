@@ -6,7 +6,7 @@ export interface Vehicules {
   modele: string;
   annee: number;
   typeVehicule: string;
-  statut: 'actif' | 'en_maintenance' | 'en_panne' | 'retire';
+  statut: 'actif' | 'maintenance_planifiee' | 'en_maintenance' | 'en_panne' | 'retire';
   kilometrage: number;
   chauffeurId?: number;
   chauffeurNom?: string;

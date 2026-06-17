@@ -42,8 +42,11 @@
     </li>
 
     <li class="nav-item" *ngIf="can('alertes:read')">
-      <a routerLink="/alertes" routerLinkActive="active" class="nav-link">
-        <i class="bi bi-bell me-2"></i> Alertes
+      <a routerLink="/alertes" routerLinkActive="active" class="nav-link d-flex align-items-center justify-content-between">
+        <span><i class="bi bi-bell me-2"></i> Alertes</span>
+        <span *ngIf="alertesActives() > 0" class="sidebar-badge">
+          {{ alertesActives() > 99 ? '99+' : alertesActives() }}
+        </span>
       </a>
     </li>
 

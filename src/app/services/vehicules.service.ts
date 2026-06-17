@@ -53,7 +53,7 @@ export class VehiculesService {
   stats = computed(() => ({
     total: this.vehicules().length,
     actifs: this.vehicules().filter(v => v.statut === 'actif').length,
-    maintenance: this.vehicules().filter(v => v.statut === 'en_maintenance').length,
+    maintenance: this.vehicules().filter(v => v.statut === 'en_maintenance' || v.statut === 'maintenance_planifiee').length,
     enPanne: this.vehicules().filter(v => v.statut === 'en_panne').length,
     retires: this.vehicules().filter(v => v.statut === 'retire').length
   }));

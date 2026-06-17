@@ -16,6 +16,8 @@ export class DashboardService {
 
   constructor() {
     this.vehiculesService.loadVehicules();
+    this.maintenanceService.loadEntretiens();
+    this.alerteService.loadAlertes();
   }
 
   stats = computed<StatDashboard>(() => {
@@ -33,7 +35,10 @@ export class DashboardService {
         .filter(p => new Date(p.date) >= debutMois)
         .reduce((sum, p) => sum + (p.quantite || 0), 0),
       coutMaintenance: entretiens
-        .filter(e => e.statut === 'termine' && e.dateFin && new Date(e.dateFin) >= debutMois)
+        .filter(e => {
+          const dateReference = e.dateFin || e.datePlanifiee;
+          return dateReference && new Date(dateReference) >= debutMois;
+        })
         .reduce((sum, e) => sum + (e.coutReel || e.coutEstime || 0), 0),
       alertesEnCours: alertes.filter(a => a.statut === 'active').length,
       vehiculesEnPanne: vehicules.filter(v => v.statut === 'en_panne').length
@@ -49,7 +54,9 @@ export class DashboardService {
       immatriculation: v.immatriculation,
       chauffeur: v.chauffeurNom || 'Non assigné',
       kilometrage: v.kilometrage || 0,
-      statut: v.statut === 'en_maintenance' ? 'maintenance' : (v.statut as VehiculeResume['statut'])
+      statut: v.statut === 'en_maintenance' || v.statut === 'maintenance_planifiee'
+        ? 'maintenance'
+        : (v.statut as VehiculeResume['statut'])
     }))
   );
 

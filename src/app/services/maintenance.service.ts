@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Entretien, StatsMaintenance } from '../Modeles/maintenance';
+import { VehiculesService } from './vehicules.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ export class MaintenanceService {
   filtreStatut = signal<string>('tous');
   searchQuery = signal('');
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private vehiculesService: VehiculesService) {
     this.loadEntretiens();
   }
 
@@ -74,23 +75,32 @@ export class MaintenanceService {
 
   addEntretien(entretien: Omit<Entretien, 'id'>): void {
     this.http.post<Entretien>(this.apiUrl, entretien).subscribe({
-      next: created => this.entretiens.update(list => [...list, this.normalizeEntretien(created)]),
+      next: created => {
+        this.entretiens.update(list => [...list, this.normalizeEntretien(created)]);
+        this.vehiculesService.loadVehicules();
+      },
       error: err => console.error('Erreur ajout maintenance', err)
     });
   }
 
   updateEntretien(id: number, updatedEntretien: Partial<Entretien>): void {
     this.http.put<Entretien>(`${this.apiUrl}/${id}`, updatedEntretien).subscribe({
-      next: updated => this.entretiens.update(list =>
-        list.map(entretien => entretien.id === id ? this.normalizeEntretien(updated) : entretien)
-      ),
+      next: updated => {
+        this.entretiens.update(list =>
+          list.map(entretien => entretien.id === id ? this.normalizeEntretien(updated) : entretien)
+        );
+        this.vehiculesService.loadVehicules();
+      },
       error: err => console.error('Erreur modification maintenance', err)
     });
   }
 
   deleteEntretien(id: number): void {
     this.http.delete<void>(`${this.apiUrl}/${id}`).subscribe({
-      next: () => this.entretiens.update(list => list.filter(entretien => entretien.id !== id)),
+      next: () => {
+        this.entretiens.update(list => list.filter(entretien => entretien.id !== id));
+        this.vehiculesService.loadVehicules();
+      },
       error: err => console.error('Erreur suppression maintenance', err)
     });
   }
