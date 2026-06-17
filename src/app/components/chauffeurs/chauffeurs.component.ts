@@ -5,6 +5,7 @@ import { Chauffeur } from '../../Modeles/chauffeur';
 import { ChauffeurService } from '../../services/chauffeur.service';
 import { Vehicules } from '../../Modeles/vehicules';
 import { VehiculesService } from '../../services/vehicules.service';
+import { AuthService } from '../../services/auth.service';
 
 // Constants
 const PERMIS_CATEGORIES = ['A', 'A1', 'B', 'B1', 'C', 'C1', 'D', 'D1', 'E'];
@@ -28,6 +29,7 @@ export class ChauffeursComponent implements OnInit {
   // ─── Services ──────────────────────────────────────────────────────────
   private chauffeurService = inject(ChauffeurService);
   private vehiculesService = inject(VehiculesService);
+  private authService = inject(AuthService);
 
   // ─── Signals partagés avec le service ──────────────────────────────────
   chauffeurs = this.chauffeurService.chauffeurs;
@@ -66,7 +68,9 @@ export class ChauffeursComponent implements OnInit {
   readonly PERMIS_CATEGORIES = PERMIS_CATEGORIES;
   readonly SITES_DISPONIBLES = SITES_DISPONIBLES;
   
-  canManage = true;
+  get canManage(): boolean {
+    return this.authService.hasPermission('chauffeurs:write');
+  }
 
   availableVehicules = computed(() => {
     const selectedId = this.selectedChauffeur()?.id;

@@ -64,7 +64,7 @@
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Type</label>
-              <select class="form-select" name="typeUtilisateur" [(ngModel)]="formData.typeUtilisateur">
+              <select class="form-select" name="typeUtilisateur" [(ngModel)]="formData.typeUtilisateur" (ngModelChange)="applyPresetPermissions()">
                 <option value="ADMINISTRATEUR">Administrateur</option>
                 <option value="GESTIONNAIRE">Gestionnaire</option>
                 <option value="CHAUFFEUR">Chauffeur</option>
@@ -85,6 +85,22 @@
             <div class="col-md-6"><label class="form-label">Telephone</label><input class="form-control" name="telephone" [(ngModel)]="formData.telephone"></div>
             <div class="col-md-6"><label class="form-label">Site</label><input class="form-control" name="site" [(ngModel)]="formData.site"></div>
             <div class="col-12"><label class="form-label">Adresse</label><input class="form-control" name="adresse" [(ngModel)]="formData.adresse"></div>
+            <div class="col-12">
+              <label class="form-label">Droits d'acces</label>
+              <div class="row g-2">
+                <div class="col-md-6" *ngFor="let permission of permissionsDisponibles">
+                  <label class="form-check border rounded px-3 py-2 w-100">
+                    <input
+                      class="form-check-input me-2"
+                      type="checkbox"
+                      [checked]="hasPermission(permission.code)"
+                      (change)="togglePermission(permission.code, $any($event.target).checked)"
+                    >
+                    <span class="form-check-label">{{ permission.label }}</span>
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="modal-footer">

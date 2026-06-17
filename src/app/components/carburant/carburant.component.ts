@@ -8,6 +8,7 @@ import { Vehicules } from '../../Modeles/vehicules';
 import { Plein } from '../../Modeles/carburant';
 import { ChauffeurService } from '../../services/chauffeur.service';
 import { Chauffeur } from '../../Modeles/chauffeur';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-carburant',
@@ -19,6 +20,7 @@ export class CarburantComponent implements OnInit {
   private carburantService = inject(CarburantService);
   private vehiculesService = inject(VehiculesService);
   private chauffeurService = inject(ChauffeurService);
+  private authService = inject(AuthService);
   private platformId = inject(PLATFORM_ID);
 
   // Signals
@@ -42,6 +44,10 @@ export class CarburantComponent implements OnInit {
     const vehicules = this.stats().vehicules;
     return ['tous', ...vehicules];
   });
+
+  get canWrite(): boolean {
+    return this.authService.hasPermission('carburant:write');
+  }
 
   ngOnInit() {
     Chart.register(...registerables);

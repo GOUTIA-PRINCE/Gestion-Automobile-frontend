@@ -28,7 +28,7 @@
       </button>
 
 
-      <button class="btn btn-primary d-flex align-items-center gap-2" (click)="handleAdd()">
+      <button *ngIf="canWrite" class="btn btn-primary d-flex align-items-center gap-2" (click)="handleAdd()">
         <i class="bi bi-plus-lg"></i>
         <span class="d-none d-md-inline">Planifier un entretien</span>
       </button>
@@ -261,11 +261,11 @@
 
                   <!-- Actions -->
                   <div class="d-flex gap-2 mt-3">
-                    <button class="btn btn-sm btn-outline-primary" (click)="handleEdit(entretien)">
+                    <button *ngIf="canWrite" class="btn btn-sm btn-outline-primary" (click)="handleEdit(entretien)">
                       <i class="bi bi-pencil me-1"></i>
                       Modifier
                     </button>
-                    <button class="btn btn-sm btn-outline-danger" (click)="handleDelete(entretien.id)">
+                    <button *ngIf="canWrite" class="btn btn-sm btn-outline-danger" (click)="handleDelete(entretien.id)">
                       <i class="bi bi-trash me-1"></i>
                       Supprimer
                     </button>

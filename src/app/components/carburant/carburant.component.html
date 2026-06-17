@@ -25,7 +25,7 @@
         <button class="btn btn-outline-secondary">
             <i class="bi bi-funnel"></i>
         </button>
-      <button class="btn btn-primary d-flex align-items-center gap-2" (click)="handleAdd()">
+      <button *ngIf="canWrite" class="btn btn-primary d-flex align-items-center gap-2" (click)="handleAdd()">
         <i class="bi bi-plus-lg"></i>
         <span class="d-none d-md-inline">Nouveau plein</span>
       </button>
@@ -221,10 +221,10 @@
               </td>
               <td class="text-end pe-4">
                 <div class="d-flex justify-content-end gap-2">
-                  <button class="btn btn-sm btn-outline-primary" (click)="handleEdit(plein)">
+                  <button *ngIf="canWrite" class="btn btn-sm btn-outline-primary" (click)="handleEdit(plein)">
                     <i class="bi bi-pencil"></i>
                   </button>
-                  <button class="btn btn-sm btn-outline-danger" (click)="handleDelete(plein.id)">
+                  <button *ngIf="canWrite" class="btn btn-sm btn-outline-danger" (click)="handleDelete(plein.id)">
                     <i class="bi bi-trash"></i>
                   </button>
                 </div>

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Utilisateur } from '../Modeles/utilisateur';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,17 +22,15 @@ export class UtilisateurService {
     });
   }
 
-  addUtilisateur(utilisateur: Omit<Utilisateur, 'id'>): void {
-    this.http.post<Utilisateur>(this.apiUrl, utilisateur).subscribe({
-      next: created => this.utilisateurs.update(list => [...list, created]),
-      error: err => console.error('Erreur ajout utilisateur', err)
-    });
+  addUtilisateur(utilisateur: Omit<Utilisateur, 'id'>): Observable<Utilisateur> {
+    return this.http.post<Utilisateur>(this.apiUrl, utilisateur).pipe(
+      tap(created => this.utilisateurs.update(list => [...list, created]))
+    );
   }
 
-  deleteUtilisateur(id: number): void {
-    this.http.delete<void>(`${this.apiUrl}/${id}`).subscribe({
-      next: () => this.utilisateurs.update(list => list.filter(u => u.id !== id)),
-      error: err => console.error('Erreur suppression utilisateur', err)
-    });
+  deleteUtilisateur(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => this.utilisateurs.update(list => list.filter(u => u.id !== id)))
+    );
   }
 }

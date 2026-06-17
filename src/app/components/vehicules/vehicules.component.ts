@@ -5,6 +5,7 @@ import { Vehicules } from '../../Modeles/vehicules';
 import { VehiculesService } from '../../services/vehicules.service';
 import { ChauffeurService } from '../../services/chauffeur.service';
 import { Chauffeur } from '../../Modeles/chauffeur';
+import { AuthService } from '../../services/auth.service';
 // import { HttpClientModule } from '@angular/common/http';
 
 @Component({
@@ -22,6 +23,7 @@ export class VehiculesComponent implements OnInit {
 
   private vehiculesService = inject(VehiculesService);
   private chauffeurService = inject(ChauffeurService);
+  private authService = inject(AuthService);
 
   // Utiliser les signals du service (comme dans chauffeurs)
   vehicles = this.vehiculesService.vehicules;
@@ -49,7 +51,9 @@ export class VehiculesComponent implements OnInit {
 
   // Autres signaux pour gérer l'état de l'interface
   isLoading = signal(false);
-  canManage = true;
+  get canManage(): boolean {
+    return this.authService.hasPermission('vehicules:write');
+  }
 
   isFormOpen = signal(false);
   selectedVehicle = signal<Vehicules | null>(null);

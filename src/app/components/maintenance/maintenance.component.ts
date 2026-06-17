@@ -7,6 +7,7 @@ import { Vehicules } from '../../Modeles/vehicules';
 import { Entretien } from '../../Modeles/maintenance';
 import { UtilisateurService } from '../../services/utilisateur.service';
 import { Utilisateur } from '../../Modeles/utilisateur';
+import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-maintenance',
   imports: [CommonModule, FormsModule],
@@ -18,6 +19,7 @@ export class MaintenanceComponent {
  private maintenanceService = inject(MaintenanceService);
  private vehiculesService = inject(VehiculesService);
  private utilisateurService = inject(UtilisateurService);
+ private authService = inject(AuthService);
 
   // Signals
   entretiens = this.maintenanceService.entretiens;
@@ -34,6 +36,10 @@ export class MaintenanceComponent {
   filteredEntretiens = computed(() => this.maintenanceService.getFilteredEntretiens());
   stats = computed(() => this.maintenanceService.getStats());
   statutsCount = computed(() => this.maintenanceService.getStatutsCount());
+
+  get canWrite(): boolean {
+    return this.authService.hasPermission('maintenance:write');
+  }
   
   urgenceStats = computed(() => {
   const entretiens = this.entretiens();

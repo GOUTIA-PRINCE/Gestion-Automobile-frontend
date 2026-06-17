@@ -7,6 +7,7 @@ import { ChauffeurService } from '../../services/chauffeur.service';
 import { Vehicules } from '../../Modeles/vehicules';
 import { Chauffeur } from '../../Modeles/chauffeur';
 import { Document } from '../../Modeles/ducument';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-documents',
@@ -19,6 +20,7 @@ export class DocumentsComponent {
   private documentService = inject(DocumentService);
   private vehiculesService = inject(VehiculesService);
   private chauffeurService = inject(ChauffeurService);
+  private authService = inject(AuthService);
 
   // Signals
   documents = this.documentService.documents;
@@ -36,6 +38,10 @@ export class DocumentsComponent {
   stats = computed(() => this.documentService.getStats());
   typesOptions = computed(() => this.documentService.getTypes());
   categoriesOptions = computed(() => this.documentService.getCategories());
+
+  get canWrite(): boolean {
+    return this.authService.hasPermission('documents:write');
+  }
   
   // Computed pour les documents par catégorie
   documentsParCategorie = computed(() => {

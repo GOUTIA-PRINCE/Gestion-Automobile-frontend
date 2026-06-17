@@ -12,4 +12,5 @@ export interface Utilisateur {
   site?: string;
   numeroPermis?: string;
   categoriePermis?: string;
+  permissions?: string[];
 }

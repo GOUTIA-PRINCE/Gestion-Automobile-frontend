@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/components/profil/profil.component.css"],
+  "sourcesContent": [".avatar {\n  width: 88px;\n  height: 88px;\n  display: grid;\n  place-items: center;\n  border-radius: 50%;\n  background: #111827;\n  color: white;\n  font-size: 32px;\n  font-weight: 700;\n}\n"],
+  "mappings": ";AAAA,CAAC;AACC,SAAO;AACP,UAAQ;AACR,WAAS;AACT,eAAa;AACb,iBAAe;AACf,cAAY;AACZ,SAAO;AACP,aAAW;AACX,eAAa;AACf;",
+  "names": []
+}

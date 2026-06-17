@@ -1,0 +1,80 @@
+<div class="login-page">
+  <div class="login-panel">
+    <div class="brand">
+      <div class="brand-icon">
+        <i class="bi bi-truck-front"></i>
+      </div>
+      <div>
+        <h1>FleetPro</h1>
+        <p>Gestion de parc automobile</p>
+      </div>
+    </div>
+
+    <form (ngSubmit)="login()" class="login-form">
+      <div>
+        <label class="form-label">Email</label>
+        <input class="form-control" type="email" name="email" [(ngModel)]="email" autocomplete="email">
+      </div>
+
+      <div>
+        <label class="form-label">Mot de passe</label>
+        <div class="input-group">
+          <input class="form-control" [type]="showPassword() ? 'text' : 'password'" name="password" [(ngModel)]="password" autocomplete="current-password">
+          <button class="btn btn-outline-secondary" type="button" (click)="showPassword.set(!showPassword())">
+            <i class="bi" [ngClass]="showPassword() ? 'bi-eye-slash' : 'bi-eye'"></i>
+          </button>
+        </div>
+        <button class="btn btn-link px-0 pt-2" type="button" (click)="openReset()">Mot de passe oublie ?</button>
+      </div>
+
+      @if (error()) {
+        <div class="alert alert-danger py-2 mb-0">{{ error() }}</div>
+      }
+
+      <button class="btn btn-primary w-100" type="submit" [disabled]="isLoading()">
+        @if (isLoading()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+        Se connecter
+      </button>
+    </form>
+  </div>
+</div>
+
+@if (isResetOpen()) {
+  <div class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reinitialiser le mot de passe</h5>
+          <button type="button" class="btn-close" (click)="isResetOpen.set(false)"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input class="form-control" type="email" name="resetEmail" [(ngModel)]="resetEmail">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Nouveau mot de passe</label>
+            <div class="input-group">
+              <input class="form-control" [type]="showNewPassword() ? 'text' : 'password'" name="newPassword" [(ngModel)]="newPassword">
+              <button class="btn btn-outline-secondary" type="button" (click)="showNewPassword.set(!showNewPassword())">
+                <i class="bi" [ngClass]="showNewPassword() ? 'bi-eye-slash' : 'bi-eye'"></i>
+              </button>
+            </div>
+          </div>
+          @if (resetMessage()) {
+            <div class="alert py-2 mb-0" [ngClass]="resetMessage()?.includes('reinitialise') ? 'alert-success' : 'alert-danger'">
+              {{ resetMessage() }}
+            </div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" (click)="isResetOpen.set(false)">Fermer</button>
+          <button class="btn btn-primary" type="button" [disabled]="isResetLoading()" (click)="resetPassword()">Reinitialiser</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show"></div>
+}

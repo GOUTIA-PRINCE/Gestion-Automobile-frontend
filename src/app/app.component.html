@@ -1,4 +1,7 @@
 
+@if (isLoginRoute()) {
+  <router-outlet></router-outlet>
+} @else {
 <div class="app-layout">
   <!-- Sidebar pour desktop -->
   <div class="sidebar-desktop d-none d-md-block">
@@ -29,3 +32,4 @@
     </div>
   </div>
 </div>
+}

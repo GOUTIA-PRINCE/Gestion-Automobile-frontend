@@ -4,7 +4,7 @@
       <h1 class="h3 fw-bold mb-1">Paramètres</h1>
       <p class="text-muted mb-0">Configuration générale de l'application</p>
     </div>
-    <button class="btn btn-outline-primary" (click)="appliquerParametresGeneraux()">
+    <button *ngIf="canWrite" class="btn btn-outline-primary" (click)="appliquerParametresGeneraux()">
       <i class="bi bi-sliders me-1"></i> Initialiser la configuration
     </button>
   </div>
@@ -53,7 +53,7 @@
               <textarea class="form-control" rows="3" [ngModel]="form().description" (ngModelChange)="updateField('description', $event)" name="description"></textarea>
             </div>
             <div class="d-flex gap-2">
-              <button class="btn btn-primary" type="submit">
+              <button *ngIf="canWrite" class="btn btn-primary" type="submit">
                 <i class="bi bi-check-lg me-1"></i>{{ editionId() ? 'Enregistrer' : 'Ajouter' }}
               </button>
               <button class="btn btn-outline-secondary" type="button" (click)="resetForm()">Annuler</button>
@@ -81,10 +81,10 @@
                   }
                 </div>
                 <div class="d-flex gap-2 align-items-start">
-                  <button class="btn btn-sm btn-outline-primary" (click)="handleEdit(parametre)">
+                  <button *ngIf="canWrite" class="btn btn-sm btn-outline-primary" (click)="handleEdit(parametre)">
                     <i class="bi bi-pencil"></i>
                   </button>
-                  <button class="btn btn-sm btn-outline-danger" (click)="handleDelete(parametre.id)">
+                  <button *ngIf="canWrite" class="btn btn-sm btn-outline-danger" (click)="handleDelete(parametre.id)">
                     <i class="bi bi-trash"></i>
                   </button>
                 </div>

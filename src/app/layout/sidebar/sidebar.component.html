@@ -5,51 +5,50 @@
   </div>
 
   <ul class="nav nav-pills flex-column mb-auto">
-    <li class="nav-item">
+    <li class="nav-item" *ngIf="can('dashboard:read')">
       <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
         <i class="bi bi-speedometer2 me-2"></i> Tableau de bord
       </a>
     </li>
 
-    <li class="nav-item">
-      <a routerLink="/vehicules" class="nav-link">
-        <i class="bi bi-car-front me-2"></i> Véhicules
+    <li class="nav-item" *ngIf="can('vehicules:read')">
+      <a routerLink="/vehicules" routerLinkActive="active" class="nav-link">
+        <i class="bi bi-car-front me-2"></i> Vehicules
       </a>
     </li>
 
-    <li class="nav-item">
-      <a routerLink="/chauffeurs" class="nav-link">
+    <li class="nav-item" *ngIf="can('chauffeurs:read')">
+      <a routerLink="/chauffeurs" routerLinkActive="active" class="nav-link">
         <i class="bi bi-person-badge me-2"></i> Chauffeurs
       </a>
     </li>
 
-    <li class="nav-item">
-      <a routerLink="/carburant" class="nav-link">
+    <li class="nav-item" *ngIf="can('carburant:read')">
+      <a routerLink="/carburant" routerLinkActive="active" class="nav-link">
         <i class="bi bi-fuel-pump me-2"></i> Carburant
       </a>
     </li>
 
-    <li class="nav-item">
-      <a routerLink="/maintenance" class="nav-link">
+    <li class="nav-item" *ngIf="can('maintenance:read')">
+      <a routerLink="/maintenance" routerLinkActive="active" class="nav-link">
         <i class="bi bi-tools me-2"></i> Maintenance
       </a>
     </li>
 
-    <li class="nav-item">
-      <a routerLink="/documents" class="nav-link">
+    <li class="nav-item" *ngIf="can('documents:read')">
+      <a routerLink="/documents" routerLinkActive="active" class="nav-link">
         <i class="bi bi-folder2-open me-2"></i> Documents
       </a>
     </li>
 
-    <li class="nav-item">
-      <a routerLink="/alertes" class="nav-link d-flex justify-content-between">
-        <span><i class="bi bi-bell me-2"></i> Alertes</span>
-        <span class="badge bg-danger">4</span>
+    <li class="nav-item" *ngIf="can('alertes:read')">
+      <a routerLink="/alertes" routerLinkActive="active" class="nav-link">
+        <i class="bi bi-bell me-2"></i> Alertes
       </a>
     </li>
 
-    <li class="nav-item">
-      <a routerLink="/admin" class="nav-link">
+    <li class="nav-item" *ngIf="can('admin:read')">
+      <a routerLink="/admin" routerLinkActive="active" class="nav-link">
         <i class="bi bi-shield-lock me-2"></i> Admin
       </a>
     </li>
@@ -57,6 +56,10 @@
 
   <hr>
 
-  <a routerLink="/parametres" class="nav-link"><i class="bi bi-gear me-2"></i> Paramètres</a>
-  <a class="nav-link"><i class="bi bi-box-arrow-right me-2"></i> Déconnexion</a>
+  <a *ngIf="can('parametres:read')" routerLink="/parametres" routerLinkActive="active" class="nav-link">
+    <i class="bi bi-gear me-2"></i> Parametres
+  </a>
+  <button class="nav-link text-start border-0 bg-transparent" type="button" (click)="logout()">
+    <i class="bi bi-box-arrow-right me-2"></i> Deconnexion
+  </button>
 </nav>

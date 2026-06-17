@@ -1,0 +1,56 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-0 fw-bold">Mon compte</h2>
+      <p class="text-muted mb-0">Informations de profil et droits d'acces</p>
+    </div>
+  </div>
+
+  @if (auth.currentUser(); as user) {
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body text-center">
+            <div class="avatar mx-auto mb-3">
+              {{ user.prenom[0] + user.nom[0] }}
+            </div>
+            <h4 class="mb-1">{{ user.prenom }} {{ user.nom }}</h4>
+            <div class="text-muted">{{ user.typeUtilisateur }}</div>
+            <span class="badge mt-3" [ngClass]="user.statut === 'ACTIF' ? 'bg-success' : 'bg-secondary'">
+              {{ user.statut }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-transparent border-0 py-3">
+            <h5 class="mb-0 fw-bold">Informations personnelles</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6"><div class="text-muted small">Email</div><div class="fw-medium">{{ user.email }}</div></div>
+              <div class="col-md-6"><div class="text-muted small">Telephone</div><div class="fw-medium">{{ user.telephone || '-' }}</div></div>
+              <div class="col-md-6"><div class="text-muted small">Adresse</div><div class="fw-medium">{{ user.adresse || '-' }}</div></div>
+              <div class="col-md-6"><div class="text-muted small">Site</div><div class="fw-medium">{{ user.site || '-' }}</div></div>
+              <div class="col-md-6" *ngIf="user.numeroPermis"><div class="text-muted small">Numero permis</div><div class="fw-medium">{{ user.numeroPermis }}</div></div>
+              <div class="col-md-6" *ngIf="user.categoriePermis"><div class="text-muted small">Categorie permis</div><div class="fw-medium">{{ user.categoriePermis }}</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-transparent border-0 py-3">
+            <h5 class="mb-0 fw-bold">Droits d'acces</h5>
+          </div>
+          <div class="card-body">
+            <span class="badge bg-primary-subtle text-primary me-2 mb-2" *ngFor="let permission of user.permissions">
+              {{ permission }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

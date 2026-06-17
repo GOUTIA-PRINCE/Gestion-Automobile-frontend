@@ -3,6 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Parametre } from '../../Modeles/parametre';
 import { ParametreService } from '../../services/parametre.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-parametres',
@@ -12,6 +13,7 @@ import { ParametreService } from '../../services/parametre.service';
 })
 export class ParametresComponent {
   private parametreService = inject(ParametreService);
+  private authService = inject(AuthService);
 
   searchQuery = this.parametreService.searchQuery;
   parametres = this.parametreService.filteredParametres;
@@ -35,6 +37,10 @@ export class ParametresComponent {
     { cleParametre: 'alerte_expiration_documents_jours', valeur: '30', description: 'Delai avant alerte document expirant', categorie: 'alertes' },
     { cleParametre: 'maintenance_rappel_km', valeur: '5000', description: 'Intervalle kilometrique de rappel maintenance', categorie: 'maintenance' }
   ];
+
+  get canWrite(): boolean {
+    return this.authService.hasPermission('parametres:write');
+  }
 
   appliquerParametresGeneraux(): void {
     const clesExistantes = new Set(this.parametreService.parametres().map(p => p.cleParametre));
