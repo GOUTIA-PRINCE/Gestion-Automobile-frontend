@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/components/admin/admin.component.css"],
+  "sourcesContent": [".admin-container {\n  padding: 1.5rem;\n}\n\n.card {\n  border-radius: 8px;\n}\n"],
+  "mappings": ";AAAA,CAAC;AACC,WAAS;AACX;AAEA,CAAC;AACC,iBAAe;AACjB;",
+  "names": []
+}

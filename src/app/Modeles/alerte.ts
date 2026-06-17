@@ -1,6 +1,6 @@
 export interface Alerte {
   id: number;
-  type: 'assurance' | 'revision' | 'carte_grise' | 'vidange' | 'entretien' | 'pneu' | 'controle_technique' | 'permis' | 'autre';
+  type: 'assurance' | 'revision' | 'carte_grise' | 'vidange' | 'entretien' | 'pneu' | 'controle_technique' | 'permis' | 'document' | 'autre';
   titre: string;
   description: string;
   vehiculeId?: number;

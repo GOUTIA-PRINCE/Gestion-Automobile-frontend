@@ -1,55 +1,101 @@
 <div class="container-fluid">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="mb-0 fw-bold">Mon compte</h2>
-      <p class="text-muted mb-0">Informations de profil et droits d'acces</p>
-    </div>
-  </div>
-
   @if (auth.currentUser(); as user) {
-    <div class="row g-4">
-      <div class="col-lg-4">
-        <div class="card border-0 shadow-sm">
-          <div class="card-body text-center">
-            <div class="avatar mx-auto mb-3">
-              {{ user.prenom[0] + user.nom[0] }}
+    <div class="profile-header mb-4">
+      <div class="avatar">{{ initials(user) }}</div>
+      <div class="flex-grow-1">
+        <h2 class="mb-1">{{ user.prenom }} {{ user.nom }}</h2>
+        <div class="text-muted">{{ user.email }}</div>
+        <div class="text-muted">{{ user.typeUtilisateur }}</div>
+      </div>
+      <button class="btn btn-primary" type="button" *ngIf="!isEditing()" (click)="startEdit()">
+        <i class="bi bi-pencil me-1"></i> Modifier mon profil
+      </button>
+    </div>
+
+    <ul class="nav nav-tabs mb-4">
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab() === 'personnel'" (click)="activeTab.set('personnel')">Personnel</button></li>
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab() === 'contact'" (click)="activeTab.set('contact')">Contact et pro</button></li>
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab() === 'securite'" (click)="activeTab.set('securite')">Securite</button></li>
+      <li class="nav-item"><button class="nav-link" [class.active]="activeTab() === 'droits'" (click)="activeTab.set('droits')">Droits</button></li>
+    </ul>
+
+    @if (message()) {
+      <div class="alert py-2" [ngClass]="message()?.includes('jour') ? 'alert-success' : 'alert-danger'">{{ message() }}</div>
+    }
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        @if (activeTab() === 'personnel') {
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Prenom</label>
+              <input class="form-control" [(ngModel)]="formData.prenom" [disabled]="!isEditing()">
             </div>
-            <h4 class="mb-1">{{ user.prenom }} {{ user.nom }}</h4>
-            <div class="text-muted">{{ user.typeUtilisateur }}</div>
-            <span class="badge mt-3" [ngClass]="user.statut === 'ACTIF' ? 'bg-success' : 'bg-secondary'">
-              {{ user.statut }}
-            </span>
+            <div class="col-md-6">
+              <label class="form-label">Nom</label>
+              <input class="form-control" [(ngModel)]="formData.nom" [disabled]="!isEditing()">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input class="form-control" type="email" [(ngModel)]="formData.email" [disabled]="!isEditing()">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Statut</label>
+              <input class="form-control" [value]="user.statut" disabled>
+            </div>
           </div>
-        </div>
+        }
+
+        @if (activeTab() === 'contact') {
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Telephone</label>
+              <input class="form-control" [(ngModel)]="formData.telephone" [disabled]="!isEditing()">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Site</label>
+              <input class="form-control" [(ngModel)]="formData.site" [disabled]="!isEditing()">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Adresse</label>
+              <input class="form-control" [(ngModel)]="formData.adresse" [disabled]="!isEditing()">
+            </div>
+            <div class="col-md-6" *ngIf="user.typeUtilisateur === 'CHAUFFEUR'">
+              <label class="form-label">Numero permis</label>
+              <input class="form-control" [(ngModel)]="formData.numeroPermis" [disabled]="!isEditing()">
+            </div>
+            <div class="col-md-6" *ngIf="user.typeUtilisateur === 'CHAUFFEUR'">
+              <label class="form-label">Categorie permis</label>
+              <input class="form-control" [(ngModel)]="formData.categoriePermis" [disabled]="!isEditing()">
+            </div>
+          </div>
+        }
+
+        @if (activeTab() === 'securite') {
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nouveau mot de passe</label>
+              <div class="input-group">
+                <input class="form-control" [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="formData.password" [disabled]="!isEditing()">
+                <button class="btn btn-outline-secondary" type="button" (click)="showPassword.set(!showPassword())">
+                  <i class="bi" [ngClass]="showPassword() ? 'bi-eye-slash' : 'bi-eye'"></i>
+                </button>
+              </div>
+              <div class="form-text">Laissez vide pour conserver le mot de passe actuel.</div>
+            </div>
+          </div>
+        }
+
+        @if (activeTab() === 'droits') {
+          <span class="badge bg-primary-subtle text-primary me-2 mb-2" *ngFor="let permission of user.permissions">
+            {{ permission }}
+          </span>
+        }
       </div>
 
-      <div class="col-lg-8">
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-header bg-transparent border-0 py-3">
-            <h5 class="mb-0 fw-bold">Informations personnelles</h5>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6"><div class="text-muted small">Email</div><div class="fw-medium">{{ user.email }}</div></div>
-              <div class="col-md-6"><div class="text-muted small">Telephone</div><div class="fw-medium">{{ user.telephone || '-' }}</div></div>
-              <div class="col-md-6"><div class="text-muted small">Adresse</div><div class="fw-medium">{{ user.adresse || '-' }}</div></div>
-              <div class="col-md-6"><div class="text-muted small">Site</div><div class="fw-medium">{{ user.site || '-' }}</div></div>
-              <div class="col-md-6" *ngIf="user.numeroPermis"><div class="text-muted small">Numero permis</div><div class="fw-medium">{{ user.numeroPermis }}</div></div>
-              <div class="col-md-6" *ngIf="user.categoriePermis"><div class="text-muted small">Categorie permis</div><div class="fw-medium">{{ user.categoriePermis }}</div></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-transparent border-0 py-3">
-            <h5 class="mb-0 fw-bold">Droits d'acces</h5>
-          </div>
-          <div class="card-body">
-            <span class="badge bg-primary-subtle text-primary me-2 mb-2" *ngFor="let permission of user.permissions">
-              {{ permission }}
-            </span>
-          </div>
-        </div>
+      <div class="card-footer bg-transparent d-flex justify-content-end gap-2" *ngIf="isEditing()">
+        <button class="btn btn-secondary" type="button" (click)="cancelEdit()">Annuler</button>
+        <button class="btn btn-primary" type="button" (click)="save()">Enregistrer</button>
       </div>
     </div>
   }

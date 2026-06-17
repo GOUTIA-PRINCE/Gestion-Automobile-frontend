@@ -80,6 +80,7 @@ export class AlertesComponent {
       'pneu': 'bi-circle',
       'controle_technique': 'bi-clipboard-check',
       'permis': 'bi-person-badge',
+      'document': 'bi-file-earmark-excel',
       'autre': 'bi-exclamation-triangle'
     };
     return icons[type] || 'bi-exclamation-triangle';
@@ -95,6 +96,7 @@ export class AlertesComponent {
       'pneu': 'Pneus',
       'controle_technique': 'Contrôle technique',
       'permis': 'Permis',
+      'document': 'Document',
       'autre': 'Autre'
     };
     return labels[type] || type;

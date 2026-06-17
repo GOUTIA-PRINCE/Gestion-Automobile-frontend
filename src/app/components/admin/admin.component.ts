@@ -15,6 +15,7 @@ export class AdminComponent {
 
   utilisateurs = this.utilisateurService.utilisateurs;
   isFormOpen = signal(false);
+  selectedUser = signal<Utilisateur | null>(null);
   formData: Omit<Utilisateur, 'id'> = this.createEmptyForm();
   permissionsDisponibles = [
     { code: 'dashboard:read', label: 'Voir tableau de bord' },
@@ -43,8 +44,19 @@ export class AdminComponent {
   }));
 
   handleAdd(): void {
+    this.selectedUser.set(null);
     this.formData = this.createEmptyForm();
     this.applyPresetPermissions();
+    this.isFormOpen.set(true);
+  }
+
+  handleEdit(user: Utilisateur): void {
+    this.selectedUser.set(user);
+    this.formData = {
+      ...user,
+      password: '',
+      permissions: [...(user.permissions || [])]
+    };
     this.isFormOpen.set(true);
   }
 
@@ -53,10 +65,18 @@ export class AdminComponent {
       alert('Veuillez renseigner nom, prenom et email');
       return;
     }
-    this.utilisateurService.addUtilisateur(this.formData).subscribe({
-      next: () => this.isFormOpen.set(false),
-      error: err => alert(err?.error?.message || err?.message || 'Erreur creation utilisateur')
-    });
+    const selected = this.selectedUser();
+    if (selected) {
+      this.utilisateurService.updateUtilisateur(selected.id, this.formData).subscribe({
+        next: () => this.closeForm(),
+        error: err => alert(err?.error?.message || err?.message || 'Erreur modification utilisateur')
+      });
+    } else {
+      this.utilisateurService.addUtilisateur(this.formData).subscribe({
+        next: () => this.closeForm(),
+        error: err => alert(err?.error?.message || err?.message || 'Erreur creation utilisateur')
+      });
+    }
   }
 
   handleDelete(id: number): void {
@@ -65,6 +85,12 @@ export class AdminComponent {
         error: err => alert(err?.error?.message || err?.message || 'Erreur suppression utilisateur')
       });
     }
+  }
+
+  closeForm(): void {
+    this.isFormOpen.set(false);
+    this.selectedUser.set(null);
+    this.formData = this.createEmptyForm();
   }
 
   applyPresetPermissions(): void {

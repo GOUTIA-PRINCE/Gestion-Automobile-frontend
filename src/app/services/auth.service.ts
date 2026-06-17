@@ -24,6 +24,15 @@ export class AuthService {
     return this.http.post<void>(`${this.apiUrl}/reset-password`, { email, nouveauMotDePasse });
   }
 
+  updateProfil(utilisateur: Partial<Utilisateur>) {
+    return this.http.put<Utilisateur>('http://localhost:8080/api/profil', utilisateur);
+  }
+
+  refreshCurrentUser(utilisateur: Utilisateur): void {
+    this.storage()?.setItem(this.userKey, JSON.stringify(utilisateur));
+    this.currentUser.set(utilisateur);
+  }
+
   setSession(response: AuthResponse): void {
     this.storage()?.setItem(this.tokenKey, response.token);
     this.storage()?.setItem(this.userKey, JSON.stringify(response.utilisateur));

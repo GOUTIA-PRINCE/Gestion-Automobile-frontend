@@ -28,6 +28,12 @@ export class UtilisateurService {
     );
   }
 
+  updateUtilisateur(id: number, utilisateur: Partial<Utilisateur>): Observable<Utilisateur> {
+    return this.http.put<Utilisateur>(`${this.apiUrl}/${id}`, utilisateur).pipe(
+      tap(updated => this.utilisateurs.update(list => list.map(u => u.id === id ? updated : u)))
+    );
+  }
+
   deleteUtilisateur(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
       tap(() => this.utilisateurs.update(list => list.filter(u => u.id !== id)))
