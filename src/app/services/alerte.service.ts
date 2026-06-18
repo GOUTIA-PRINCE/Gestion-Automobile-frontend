@@ -135,7 +135,7 @@ export class AlerteService {
   private handleError(message: string, err: any): void {
     console.error(message, err);
     if (err?.status === 403) {
-      alert("Vous n'avez pas les droits");
+      alert("Vous n'avez pas droit");
     }
   }
 }
