@@ -12,13 +12,24 @@ export class AlerteService {
   filtreType = signal<string>('tous');
   filtreStatut = signal<string>('tous');
   searchQuery = signal('');
+  private isLoading = false;
 
   constructor(private http: HttpClient) {}
 
   loadAlertes(): void {
+    if (this.isLoading) {
+      return;
+    }
+    this.isLoading = true;
     this.http.get<Alerte[]>(this.apiUrl).subscribe({
-      next: data => this.alertes.set(data.map(a => this.normalizeAlerte(a))),
-      error: err => console.error('Erreur chargement alertes', err)
+      next: data => {
+        this.alertes.set(data.map(a => this.normalizeAlerte(a)));
+        this.isLoading = false;
+      },
+      error: err => {
+        console.error('Erreur chargement alertes', err);
+        this.isLoading = false;
+      }
     });
   }
 
