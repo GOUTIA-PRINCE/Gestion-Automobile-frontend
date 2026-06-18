@@ -74,7 +74,7 @@ export class AlerteService {
   addAlerte(alerte: Omit<Alerte, 'id'>): void {
     this.http.post<Alerte>(this.apiUrl, alerte).subscribe({
       next: created => this.alertes.update(list => [...list, this.normalizeAlerte(created)]),
-      error: err => console.error('Erreur ajout alerte', err)
+      error: err => this.handleError('Erreur ajout alerte', err)
     });
   }
 
@@ -83,14 +83,14 @@ export class AlerteService {
       next: updated => this.alertes.update(list =>
         list.map(alerte => alerte.id === id ? this.normalizeAlerte(updated) : alerte)
       ),
-      error: err => console.error('Erreur modification alerte', err)
+      error: err => this.handleError('Erreur modification alerte', err)
     });
   }
 
   deleteAlerte(id: number): void {
     this.http.delete<void>(`${this.apiUrl}/${id}`).subscribe({
       next: () => this.alertes.update(list => list.filter(alerte => alerte.id !== id)),
-      error: err => console.error('Erreur suppression alerte', err)
+      error: err => this.handleError('Erreur suppression alerte', err)
     });
   }
 
@@ -99,7 +99,7 @@ export class AlerteService {
       next: updated => this.alertes.update(list =>
         list.map(alerte => alerte.id === id ? this.normalizeAlerte(updated) : alerte)
       ),
-      error: err => console.error('Erreur resolution alerte', err)
+      error: err => this.handleError('Erreur resolution alerte', err)
     });
   }
 
@@ -119,5 +119,12 @@ export class AlerteService {
       dateCreation: new Date(alerte.dateCreation),
       dateEcheance: alerte.dateEcheance ? new Date(alerte.dateEcheance) : undefined
     };
+  }
+
+  private handleError(message: string, err: any): void {
+    console.error(message, err);
+    if (err?.status === 403) {
+      alert("Vous n'avez pas les droits");
+    }
   }
 }
