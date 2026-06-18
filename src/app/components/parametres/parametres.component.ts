@@ -61,18 +61,6 @@ export class ParametresComponent {
       icon: 'bi-lock',
       titre: 'Confidentialite',
       description: 'Acces, droits utilisateurs et sessions'
-    },
-    {
-      id: 'discussions',
-      icon: 'bi-chat-square-text',
-      titre: 'Discussions',
-      description: 'Theme, affichage et preferences interface'
-    },
-    {
-      id: 'audio',
-      icon: 'bi-camera-video',
-      titre: 'Video et audio',
-      description: 'Camera, micro et haut-parleurs'
     }
   ];
   activeGroupe = signal(this.groupesParametres[0]);
