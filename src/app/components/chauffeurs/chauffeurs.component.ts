@@ -6,10 +6,11 @@ import { ChauffeurService } from '../../services/chauffeur.service';
 import { Vehicules } from '../../Modeles/vehicules';
 import { VehiculesService } from '../../services/vehicules.service';
 import { AuthService } from '../../services/auth.service';
+import { GeolocalisationService, PlanifierMissionRequest } from '../../services/geolocalisation.service';
 
 // Constants
 const PERMIS_CATEGORIES = ['A', 'A1', 'B', 'B1', 'C', 'C1', 'D', 'D1', 'E'];
-const SITES_DISPONIBLES = ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice', 'Bordeaux', 'Strasbourg', 'Montpellier', 'Nantes', 'Autres'];
+const SITES_DISPONIBLES = ['Douala', 'Yaounde', 'Bafoussam', 'Maroua', 'Kribi', 'Bertoua', 'Ebolowa', 'Limbe', 'Bamenda', 'Ngaoundere'];
 const MAX_PHOTO_SIZE_BYTES = 1_000_000;
 
 interface FormData extends Partial<Chauffeur> {
@@ -30,6 +31,7 @@ export class ChauffeursComponent implements OnInit {
   private chauffeurService = inject(ChauffeurService);
   private vehiculesService = inject(VehiculesService);
   private authService = inject(AuthService);
+  private geoService = inject(GeolocalisationService);
 
   // ─── Signals partagés avec le service ──────────────────────────────────
   chauffeurs = this.chauffeurService.chauffeurs;
@@ -52,10 +54,20 @@ export class ChauffeursComponent implements OnInit {
   isLoading = signal(false);
   isFormOpen = signal(false);
   selectedChauffeur = signal<Chauffeur | null>(null);
-  
+
+  // ─── États pour le modal de planification de mission ───────────────────
+  isMissionModalOpen = signal(false);
+  chauffeurPourMission = signal<Chauffeur | null>(null);
+
+  nouvelleMission = {
+    vehiculeId: 0,
+    pointDepart: '',
+    pointArrivee: ''
+  };
+
   // ─── Stepper states ─────────────────────────────────────────────────────
   currentStep = signal<'photo' | 'perso' | 'permis' | 'pro' | 'vehicule'>('photo');
-  
+
   stepCompletionStatus = signal({
     photo: false,
     perso: false,
@@ -67,7 +79,7 @@ export class ChauffeursComponent implements OnInit {
   // ─── Constants for templates ────────────────────────────────────────────
   readonly PERMIS_CATEGORIES = PERMIS_CATEGORIES;
   readonly SITES_DISPONIBLES = SITES_DISPONIBLES;
-  
+
   get canManage(): boolean {
     return this.authService.hasPermission('chauffeurs:write');
   }
@@ -156,6 +168,49 @@ export class ChauffeursComponent implements OnInit {
         }
       });
     }
+  }
+
+  // ─── Actions du modal de mission ────────────────────────────────────────
+
+  /**
+   * Ouvre le modal de planification de mission pour un chauffeur donné
+   */
+  ouvrirModalMission(chauffeur: Chauffeur): void {
+    this.chauffeurPourMission.set(chauffeur);
+    this.nouvelleMission = { vehiculeId: 0, pointDepart: '', pointArrivee: '' };
+    this.isMissionModalOpen.set(true);
+  }
+
+  /**
+   * Ferme le modal de planification de mission
+   */
+  fermerModalMission(): void {
+    this.isMissionModalOpen.set(false);
+    this.chauffeurPourMission.set(null);
+    this.nouvelleMission = { vehiculeId: 0, pointDepart: '', pointArrivee: '' };
+  }
+
+  /**
+   * Planifie une nouvelle mission pour le chauffeur sélectionné
+   */
+  planifierMission(): void {
+    const chauffeur = this.chauffeurPourMission();
+    if (!chauffeur) return;
+
+    const request: PlanifierMissionRequest = {
+      vehiculeId: this.nouvelleMission.vehiculeId,
+      chauffeurId: chauffeur.id,
+      pointDepart: this.nouvelleMission.pointDepart,
+      pointArrivee: this.nouvelleMission.pointArrivee
+    };
+
+    this.geoService.planifierMission(request).subscribe({
+      next: () => {
+        alert('Mission planifiée avec succès pour ' + chauffeur.prenom + ' ' + chauffeur.nom);
+        this.fermerModalMission();
+      },
+      error: (err) => alert('Erreur lors de la planification : ' + err.message)
+    });
   }
 
   // ─── Stepper navigation ─────────────────────────────────────────────────

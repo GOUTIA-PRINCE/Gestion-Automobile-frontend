@@ -227,27 +227,34 @@
           
         </div>
 
-        <!-- Actions -->
-        <div class="card-footer bg-transparent border-top-0 pt-0 px-4 pb-4" *ngIf="canManage">
-          <div class="d-flex justify-content-between">
-            <button
-              class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1"
-              (click)="handleDelete(c.id)"
-            >
-              <i class="bi bi-trash"></i>
-              <span class="d-none d-md-inline">Supprimer</span>
-            </button>
-            
-            <button
-              class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
-              (click)="handleEdit(c)"
-            >
-              <i class="bi bi-pencil"></i>
-              <span class="d-none d-md-inline">Modifier</span>
-            </button>
-          </div>
-        </div>
+       <!-- Actions -->
+<div class="card-footer bg-transparent border-top-0 pt-0 px-4 pb-4" *ngIf="canManage">
+  <div class="d-flex justify-content-between gap-2">
+    <button
+      class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1"
+      (click)="handleDelete(c.id)"
+    >
+      <i class="bi bi-trash"></i>
+      <span class="d-none d-md-inline">Supprimer</span>
+    </button>
 
+    <button
+      class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
+      (click)="handleEdit(c)"
+    >
+      <i class="bi bi-pencil"></i>
+      <span class="d-none d-md-inline">Modifier</span>
+    </button>
+
+    <button
+      class="btn btn-outline-success btn-sm d-flex align-items-center gap-1"
+      (click)="ouvrirModalMission(c)"
+    >
+      <i class="bi bi-geo-alt"></i>
+      <span class="d-none d-md-inline">Mission</span>
+    </button>
+  </div>
+</div>
       </div>
     </div>
 
@@ -602,5 +609,58 @@
       </div>
     </div>
   </div>
-  <div *ngIf="isFormOpen()" class="modal-backdrop fade show"></div>
+ <div *ngIf="isFormOpen()" class="modal-backdrop fade show"></div>
+
+  <!-- MODAL PLANIFICATION MISSION -->
+  <div *ngIf="isMissionModalOpen()" class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title">
+            Planifier une mission — {{ chauffeurPourMission()?.prenom }} {{ chauffeurPourMission()?.nom }}
+          </h5>
+          <button type="button" class="btn-close" (click)="fermerModalMission()"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <div class="mb-3">
+            <label class="form-label">Véhicule</label>
+            <select class="form-select" [(ngModel)]="nouvelleMission.vehiculeId">
+              <option [value]="0" disabled>-- Choisir un véhicule --</option>
+              <option *ngFor="let v of vehicules()" [value]="v.id">
+                {{ v.marque }} {{ v.modele }} ({{ v.immatriculation }})
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Point de départ</label>
+            <input type="text" class="form-control" [(ngModel)]="nouvelleMission.pointDepart" placeholder="Ex: Douala">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Destination</label>
+            <input type="text" class="form-control" [(ngModel)]="nouvelleMission.pointArrivee" placeholder="Ex: Yaoundé">
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="fermerModalMission()">Annuler</button>
+          <button
+            type="button"
+            class="btn btn-success"
+            (click)="planifierMission()"
+            [disabled]="!nouvelleMission.vehiculeId || !nouvelleMission.pointDepart || !nouvelleMission.pointArrivee"
+          >
+            <i class="bi bi-check-lg me-1"></i>Planifier
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div *ngIf="isMissionModalOpen()" class="modal-backdrop fade show"></div>
 </div>

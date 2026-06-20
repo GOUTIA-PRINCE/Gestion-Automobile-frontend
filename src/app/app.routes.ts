@@ -10,6 +10,8 @@ import { ParametresComponent } from './components/parametres/parametres.componen
 import { AdminComponent } from './components/admin/admin.component';
 import { LoginComponent } from './components/login/login.component';
 import { ProfilComponent } from './components/profil/profil.component';
+import { MesMissionsComponent } from './components/mes-missions/mes-missions.component';
+import { ToutesMissionsComponent } from './components/toutes-missions/toutes-missions.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -23,7 +25,9 @@ export const routes: Routes = [
   { path: 'alertes', component: AlertesComponent, canActivate: [authGuard], data: { permissions: ['alertes:read'] } },
   { path: 'parametres', component: ParametresComponent, canActivate: [authGuard], data: { permissions: ['parametres:read'] } },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard], data: { permissions: ['admin:read'] } },
+  { path: 'mes-missions', component: MesMissionsComponent, canActivate: [authGuard] },
   { path: 'profil', component: ProfilComponent, canActivate: [authGuard] },
+  { path: 'toutes-missions', component: ToutesMissionsComponent, canActivate: [authGuard] },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' }
 ];

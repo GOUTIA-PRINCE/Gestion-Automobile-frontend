@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AlerteService } from '../../services/alerte.service';
@@ -13,6 +14,7 @@ import { AlerteService } from '../../services/alerte.service';
 export class HeaderComponent implements OnInit {
   auth = inject(AuthService);
   private alerteService = inject(AlerteService);
+  private platformId = inject(PLATFORM_ID);
 
   isDark = false;
   alertesActives = computed(() =>
@@ -20,6 +22,10 @@ export class HeaderComponent implements OnInit {
   );
 
   ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      document.documentElement.setAttribute('data-bs-theme', this.isDark ? 'dark' : 'light');
+    }
+
     if (this.auth.hasPermission('alertes:read')) {
       this.alerteService.loadAlertes();
     }
@@ -27,7 +33,9 @@ export class HeaderComponent implements OnInit {
 
   toggleTheme() {
     this.isDark = !this.isDark;
-    document.body.classList.toggle('dark-mode', this.isDark);
+    if (isPlatformBrowser(this.platformId)) {
+      document.documentElement.setAttribute('data-bs-theme', this.isDark ? 'dark' : 'light');
+    }
   }
 
   initials(): string {

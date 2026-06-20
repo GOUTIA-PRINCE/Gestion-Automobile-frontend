@@ -2,11 +2,12 @@ import { Component, signal, computed, inject, OnInit, PLATFORM_ID } from '@angul
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DashboardService } from '../../services/dashboard.service';
+import { CarteVehiculesComponent } from '../carte-vehicules/carte-vehicules.component';
 import { Chart, registerables } from 'chart.js';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule,CarteVehiculesComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })

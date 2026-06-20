@@ -1,0 +1,56 @@
+<div class="container-fluid py-4">
+
+  <div class="mb-4">
+    <h4 class="fw-bold mb-0">Toutes les missions</h4>
+    <small class="text-muted">Vue d'ensemble des missions planifiées, en cours et terminées</small>
+  </div>
+
+  <app-carte-vehicules class="d-block mb-4"></app-carte-vehicules>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white">
+      <h6 class="fw-bold mb-0">Historique complet</h6>
+    </div>
+    <div class="card-body p-0">
+
+      <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+      </div>
+
+      <table *ngIf="!isLoading" class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Chauffeur</th>
+            <th>Véhicule</th>
+            <th>Trajet</th>
+            <th>Début</th>
+            <th>Fin</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let mission of missions">
+            <td>{{ mission.chauffeur.prenom }} {{ mission.chauffeur.nom }}</td>
+            <td>{{ mission.vehicule.marque }} {{ mission.vehicule.modele }} ({{ mission.vehicule.immatriculation }})</td>
+            <td>{{ mission.pointDepart }} → {{ mission.pointArrivee }}</td>
+            <td>{{ mission.dateDebut ? (mission.dateDebut | date:'dd/MM/yy HH:mm') : '-' }}</td>
+            <td>{{ mission.dateFin ? (mission.dateFin | date:'dd/MM/yy HH:mm') : '-' }}</td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'bg-warning text-dark': mission.statut === 'PLANIFIE',
+                'bg-success': mission.statut === 'EN_COURS',
+                'bg-secondary': mission.statut === 'TERMINE',
+                'bg-danger': mission.statut === 'ANNULE'
+              }">{{ mission.statut }}</span>
+            </td>
+          </tr>
+          <tr *ngIf="missions.length === 0">
+            <td colspan="6" class="text-center text-muted py-4">Aucune mission enregistrée</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+</div>
