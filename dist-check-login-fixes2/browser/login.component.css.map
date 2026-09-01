@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/components/login/login.component.css"],
-  "sourcesContent": [".login-page {\n  min-height: 100vh;\n  display: grid;\n  place-items: center;\n  background: #f4f7fb;\n  padding: 24px;\n}\n\n.login-panel {\n  width: min(430px, 100%);\n  background: #fff;\n  border: 1px solid #e5e7eb;\n  border-radius: 8px;\n  padding: 32px;\n  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);\n}\n\n.brand {\n  display: flex;\n  gap: 14px;\n  align-items: center;\n  margin-bottom: 28px;\n}\n\n.brand-icon {\n  width: 48px;\n  height: 48px;\n  display: grid;\n  place-items: center;\n  border-radius: 8px;\n  background: #0d6efd;\n  color: #fff;\n  font-size: 24px;\n}\n\n.brand h1 {\n  font-size: 28px;\n  line-height: 1;\n  margin: 0 0 4px;\n}\n\n.brand p {\n  margin: 0;\n  color: #64748b;\n}\n\n.login-form {\n  display: grid;\n  gap: 18px;\n}\n"],
-  "mappings": ";AAAA,CAAC;AACC,cAAY;AACZ,WAAS;AACT,eAAa;AACb,cAAY;AACZ,WAAS;AACX;AAEA,CAAC;AACC,SAAO,IAAI,KAAK,EAAE;AAClB,cAAY;AACZ,UAAQ,IAAI,MAAM;AAClB,iBAAe;AACf,WAAS;AACT,cAAY,EAAE,KAAK,KAAK,KAAK,EAAE,EAAE,EAAE,EAAE,EAAE,EAAE;AAC3C;AAEA,CAAC;AACC,WAAS;AACT,OAAK;AACL,eAAa;AACb,iBAAe;AACjB;AAEA,CAAC;AACC,SAAO;AACP,UAAQ;AACR,WAAS;AACT,eAAa;AACb,iBAAe;AACf,cAAY;AACZ,SAAO;AACP,aAAW;AACb;AAEA,CAlBC,MAkBM;AACL,aAAW;AACX,eAAa;AACb,UAAQ,EAAE,EAAE;AACd;AAEA,CAxBC,MAwBM;AACL,UAAQ;AACR,SAAO;AACT;AAEA,CAAC;AACC,WAAS;AACT,OAAK;AACP;",
-  "names": []
-}

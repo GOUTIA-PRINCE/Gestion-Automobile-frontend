@@ -9,7 +9,7 @@ import { tap } from 'rxjs/operators';
 })
 export class VehiculesService {
 
-  private apiUrl = 'http://localhost:8080/api/vehicules';
+  private apiUrl = '/api/vehicules';
 
   // Constructeur pour injecter le HttpClient
   constructor(private http: HttpClient) { }

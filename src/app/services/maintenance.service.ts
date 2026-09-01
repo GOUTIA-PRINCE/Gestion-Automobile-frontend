@@ -7,7 +7,7 @@ import { VehiculesService } from './vehicules.service';
   providedIn: 'root'
 })
 export class MaintenanceService {
-  private readonly apiUrl = 'http://localhost:8080/api/maintenances';
+  private readonly apiUrl = '/api/maintenances';
 
   entretiens = signal<Entretien[]>([]);
   filtreStatut = signal<string>('tous');

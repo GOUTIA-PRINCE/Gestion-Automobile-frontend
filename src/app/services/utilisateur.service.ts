@@ -7,7 +7,7 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class UtilisateurService {
-  private readonly apiUrl = 'http://localhost:8080/api/utilisateurs';
+  private readonly apiUrl = '/api/utilisateurs';
 
   utilisateurs = signal<Utilisateur[]>([]);
   isLoading = signal(false);

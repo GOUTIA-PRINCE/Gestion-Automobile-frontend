@@ -6,7 +6,7 @@ import { Utilisateur } from '../Modeles/utilisateur';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:8080/api/auth';
+  private readonly apiUrl = '/api/auth';
   private readonly tokenKey = 'fleetpro_token';
   private readonly userKey = 'fleetpro_user';
 
@@ -25,7 +25,7 @@ export class AuthService {
   }
 
   updateProfil(utilisateur: Partial<Utilisateur>) {
-    return this.http.put<Utilisateur>('http://localhost:8080/api/profil', utilisateur);
+    return this.http.put<Utilisateur>('/api/profil', utilisateur);
   }
 
   refreshCurrentUser(utilisateur: Utilisateur): void {

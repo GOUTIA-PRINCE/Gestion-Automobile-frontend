@@ -12,7 +12,7 @@ import { Observable, tap, catchError, throwError } from 'rxjs';
 })
 export class ChauffeurService {
 
-  private readonly apiUrl = 'http://localhost:8080/api/chauffeurs';
+  private readonly apiUrl = '/api/chauffeurs';
 
   constructor(private http: HttpClient) {}
 
