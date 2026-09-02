@@ -4,27 +4,24 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  position: fixed; /* Empêche le scroll global */
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  min-height: 100vh;
+  position: relative;
+  overflow-y: auto;
 }
 
 /* Layout principal */
 .app-layout {
   display: flex;
-  height: 100vh;
-  height: -webkit-fill-available; /* Pour Safari iOS */
-  height: fill-available;
-  overflow: hidden;
+  min-height: 100vh;
+  width: 100%;
   background-color: #f8fafc;
 }
 
@@ -117,14 +114,37 @@ body {
 
 /* Media query pour mobile */
 @media (max-width: 767.98px) {
+  html, body {
+    overflow-y: auto !important;
+    height: auto;
+  }
+
+  body {
+    position: static;
+    overflow-y: auto;
+  }
+
+  .app-layout {
+    display: block;
+    min-height: 100vh;
+    height: auto;
+  }
+
+  .main-content {
+    width: 100%;
+    min-width: 0;
+    max-height: none;
+  }
+
   .sidebar-desktop {
-    display: none;
+    display: none !important;
   }
   
   .content-area {
     padding: 1rem;
-    height: calc(100vh - var(--header-height, 60px));
-    max-height: calc(100vh - var(--header-height, 60px));
+    height: auto;
+    max-height: none;
+    overflow: visible;
   }
   
   .main-header header {
