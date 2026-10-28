@@ -3,6 +3,64 @@
   margin: 0 auto;
 }
 
+.folder-section-heading,
+.folder-breadcrumb {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.folder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
+  gap: .75rem;
+}
+
+.vehicle-folder {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: .85rem;
+  min-height: 100px;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  background: #fff;
+  color: #172033;
+  text-align: left;
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.vehicle-folder:hover,
+.vehicle-folder:focus-visible {
+  border-color: #93c5fd;
+  box-shadow: 0 5px 16px rgb(15 23 42 / 8%);
+  transform: translateY(-1px);
+}
+
+.folder-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 6px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 1.35rem;
+}
+
+.other-folder .folder-icon { background: #f1f5f9; color: #475569; }
+.folder-content { display: grid; min-width: 0; gap: .15rem; }
+.folder-content strong, .folder-content span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.folder-content span, .folder-content small { color: #64748b; font-size: .84rem; }
+.folder-content small { margin-top: .2rem; }
+.folder-chevron { color: #94a3b8; }
+
+.folder-breadcrumb { justify-content: flex-start; margin: .25rem 0 1rem; }
+.folder-breadcrumb strong { overflow-wrap: anywhere; }
+
 .card {
   border-radius: 12px;
   overflow: hidden;
@@ -51,6 +109,9 @@
   .list-group-item {
     padding: 0.75rem 0.5rem;
   }
+
+  .folder-section-heading { align-items: flex-start; }
+  .folder-breadcrumb { align-items: flex-start; flex-wrap: wrap; }
 }
 
 /* Dark mode support */

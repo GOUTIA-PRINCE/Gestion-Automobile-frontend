@@ -489,9 +489,15 @@ export class ChauffeursComponent implements OnInit {
       'ACTIF': 'Actif',
       'INACTIF': 'Inactif',
       'EN_CONGE': 'En congé',
-      'MISSION': 'En mission'
+      'MISSION': 'En mission',
+      'INDISPONIBLE': 'Indisponible'
     };
     return statusMap[statut] || statut;
+  }
+
+  getOperationStatus(chauffeur: Chauffeur): string {
+    return chauffeur.statutOperationnel
+      || (chauffeur.statut === 'ACTIF' && chauffeur.disponible === false ? 'INDISPONIBLE' : chauffeur.statut);
   }
 
   /**

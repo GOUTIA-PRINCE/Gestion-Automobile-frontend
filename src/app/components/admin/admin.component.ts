@@ -23,6 +23,8 @@ export class AdminComponent implements OnInit {
     { code: 'dashboard:read', label: 'Voir tableau de bord' },
     { code: 'vehicules:read', label: 'Voir vehicules' },
     { code: 'vehicules:write', label: 'Gerer vehicules' },
+    { code: 'missions:read', label: 'Voir et suivre les missions' },
+    { code: 'missions:write', label: 'Planifier et gérer les missions' },
     { code: 'chauffeurs:read', label: 'Voir chauffeurs' },
     { code: 'chauffeurs:write', label: 'Gerer chauffeurs' },
     { code: 'carburant:read', label: 'Voir carburant' },
@@ -111,11 +113,12 @@ export class AdminComponent implements OnInit {
       ADMINISTRATEUR: this.permissionsDisponibles.map(p => p.code),
       GESTIONNAIRE: [
         'dashboard:read', 'vehicules:read', 'vehicules:write', 'chauffeurs:read',
+        'missions:read', 'missions:write',
         'carburant:read', 'carburant:write', 'maintenance:read', 'maintenance:write',
         'documents:read', 'documents:write', 'alertes:read', 'alertes:write'
       ],
       CHAUFFEUR: [
-        'dashboard:read', 'vehicules:read', 'chauffeurs:read',
+        'dashboard:read', 'missions:read', 'missions:write',
         'carburant:read', 'carburant:write', 'maintenance:read', 'maintenance:write',
         'documents:read', 'alertes:read'
       ],

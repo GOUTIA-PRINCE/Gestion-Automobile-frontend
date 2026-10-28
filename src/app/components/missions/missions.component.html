@@ -1,0 +1,204 @@
+<section class="missions-page">
+  <header class="page-heading">
+    <div>
+      <h2>{{ isDriver() ? 'Mes missions' : 'Missions' }}</h2>
+      <p>{{ isDriver() ? 'Vos affectations et votre historique' : 'Planification et suivi des déplacements' }}</p>
+    </div>
+    <div class="heading-search">
+      <div class="search-filter-row">
+        <label class="search-box">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <span class="visually-hidden">Rechercher une mission</span>
+          <input type="search" placeholder="Rechercher..." [ngModel]="search()"
+                 (ngModelChange)="search.set($event)" (focus)="isFilterPanelOpen.set(true)">
+        </label>
+        <div class="filter-menu-wrap">
+          <button type="button" class="filter-toggle" [class.has-filters]="activeFilterCount() > 0"
+                  [attr.aria-expanded]="isFilterPanelOpen()" aria-label="Filtres" title="Filtres"
+                  (click)="toggleFilterPanel()">
+            <i class="bi bi-funnel" aria-hidden="true"></i>
+            <span *ngIf="activeFilterCount() > 0" class="filter-count">{{ activeFilterCount() }}</span>
+          </button>
+          <section *ngIf="isFilterPanelOpen()" class="filter-panel" aria-label="Filtres et regroupement des missions">
+            <div class="filter-column">
+              <h3><i class="bi bi-funnel-fill"></i> Filtres</h3>
+              <label>Statut
+                <select class="form-select form-select-sm" [ngModel]="filter()" (ngModelChange)="filter.set($event)">
+                  <option value="TOUTES">Tous les statuts</option>
+                  <option value="PLANIFIE">Planifiées</option>
+                  <option value="EN_COURS">En cours</option>
+                  <option value="TERMINE">Terminées</option>
+                  <option value="ANNULE">Annulées</option>
+                </select>
+              </label>
+              <label *ngIf="!isDriver()">Chauffeur
+                <select class="form-select form-select-sm" [ngModel]="chauffeurFilter() ?? ''"
+                        (ngModelChange)="chauffeurFilter.set($event ? +$event : null)">
+                  <option value="">Tous les chauffeurs</option>
+                  <option *ngFor="let driver of chauffeurFilters()" [value]="driver.id">{{ driver.nom }}</option>
+                </select>
+              </label>
+              <label>Date de début à partir du
+                <input class="form-control form-control-sm" type="date" [ngModel]="dateFrom()" (ngModelChange)="dateFrom.set($event)">
+              </label>
+              <label>Date de début jusqu’au
+                <input class="form-control form-control-sm" type="date" [ngModel]="dateTo()" (ngModelChange)="dateTo.set($event)">
+              </label>
+            </div>
+            <div class="filter-column group-column">
+              <h3><i class="bi bi-layers-fill"></i> Regrouper par</h3>
+              <label class="group-option"><input type="radio" name="missionGroup" value="none" [ngModel]="groupBy()" (ngModelChange)="groupBy.set($event)"> Aucun</label>
+              <label class="group-option"><input type="radio" name="missionGroup" value="chauffeur" [ngModel]="groupBy()" (ngModelChange)="groupBy.set($event)"> Chauffeur</label>
+              <label class="group-option"><input type="radio" name="missionGroup" value="statut" [ngModel]="groupBy()" (ngModelChange)="groupBy.set($event)"> Statut</label>
+              <label class="group-option"><input type="radio" name="missionGroup" value="date" [ngModel]="groupBy()" (ngModelChange)="groupBy.set($event)"> Jour de départ</label>
+            </div>
+            <footer class="filter-panel-footer">
+              <span>{{ visibleMissions().length }} mission(s)</span>
+              <button type="button" class="btn btn-sm btn-link" (click)="clearFilters()">Effacer les filtres</button>
+            </footer>
+          </section>
+        </div>
+      </div>
+    </div>
+    <button *ngIf="canWrite()" type="button" class="btn btn-primary" (click)="openForm()">
+      <i class="bi bi-plus-lg me-2"></i>Planifier une mission
+    </button>
+  </header>
+
+  <div *ngIf="error() && !isFormOpen()" class="alert alert-danger d-flex justify-content-between align-items-center" role="alert">
+    <span>{{ error() }}</span>
+    <button type="button" class="btn-close" aria-label="Fermer" (click)="error.set(null)"></button>
+  </div>
+
+  <div class="mission-stats" aria-label="Résumé des missions">
+    <div><span>Total</span><strong>{{ stats().total }}</strong></div>
+    <div><span>Planifiées</span><strong>{{ stats().planifiees }}</strong></div>
+    <div><span>En cours</span><strong>{{ stats().enCours }}</strong></div>
+    <div><span>Terminées</span><strong>{{ stats().terminees }}</strong></div>
+  </div>
+
+  <div class="list-toolbar">
+    <span class="result-count">{{ visibleMissions().length }} mission(s)</span>
+  </div>
+
+  <div *ngIf="isLoading()" class="empty-state" role="status">Chargement des missions...</div>
+  <div *ngIf="!isLoading() && visibleMissions().length === 0" class="empty-state">
+    <i class="bi bi-signpost-2" aria-hidden="true"></i>
+    <strong>Aucune mission à afficher</strong>
+    <span>{{ canWrite() ? 'Planifiez une mission pour commencer.' : 'Vos missions apparaîtront ici.' }}</span>
+  </div>
+
+  <div class="mission-list" *ngIf="!isLoading() && visibleMissions().length > 0">
+    <section *ngFor="let group of missionGroups()">
+      <h3 *ngIf="groupBy() !== 'none'" class="mission-group-heading">{{ group.key }}</h3>
+      <article class="mission-row" *ngFor="let mission of group.missions"
+               [class.editable-mission]="canEditMission(mission)"
+               [attr.tabindex]="canEditMission(mission) ? 0 : null"
+               [attr.role]="canEditMission(mission) ? 'button' : null"
+               [attr.aria-label]="canEditMission(mission) ? 'Modifier la mission ' + mission.id : null"
+               (click)="openEdit(mission)" (keydown.enter)="openEdit(mission)" (keydown.space)="$event.preventDefault(); openEdit(mission)">
+      <div class="mission-route">
+        <div class="route-points">
+          <span class="route-point start-point"></span>
+          <div>
+            <span class="field-label">Départ</span>
+            <strong>{{ mission.pointDepart }}</strong>
+          </div>
+          <span class="route-line"></span>
+          <span class="route-point end-point"></span>
+          <div>
+            <span class="field-label">Arrivée</span>
+            <strong>{{ mission.pointArrivee }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-vehicle">
+        <span class="field-label">Véhicule</span>
+        <strong>{{ mission.marque }} {{ mission.modele }}</strong>
+        <span>{{ mission.immatriculation }}</span>
+      </div>
+
+      <div class="mission-driver" *ngIf="!isDriver()">
+        <span class="field-label">Chauffeur</span>
+        <strong>{{ mission.chauffeurPrenom }} {{ mission.chauffeurNom }}</strong>
+      </div>
+
+      <div class="mission-dates">
+        <span class="field-label">Prévue</span>
+        <strong>{{ mission.datePrevueDebut | date:'dd/MM/yyyy HH:mm' }}</strong>
+        <span>au {{ mission.datePrevueFin | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+
+      <div class="mission-status-actions">
+        <span class="status-pill" [ngClass]="'status-' + mission.statut.toLowerCase()">{{ statusLabel(mission.statut) }}</span>
+        <div class="action-buttons">
+          <button *ngIf="isDriver() && mission.statut === 'PLANIFIE'" class="btn btn-sm btn-success" type="button" (click)="start(mission)">
+            <i class="bi bi-play-fill me-1"></i>Démarrer
+          </button>
+          <button *ngIf="isDriver() && mission.statut === 'EN_COURS'" class="btn btn-sm btn-primary" type="button" (click)="finish(mission)">
+            <i class="bi bi-check2 me-1"></i>Terminer
+          </button>
+          <button *ngIf="canEditMission(mission)" class="btn btn-sm btn-outline-primary" type="button"
+                  (click)="$event.stopPropagation(); openEdit(mission)">
+            <i class="bi bi-pencil me-1"></i>Modifier
+          </button>
+          <button *ngIf="canWrite() && mission.statut === 'PLANIFIE'" class="btn btn-sm btn-outline-danger" type="button" (click)="$event.stopPropagation(); cancel(mission)">
+            <i class="bi bi-x-lg me-1"></i>Annuler
+          </button>
+        </div>
+      </div>
+      </article>
+    </section>
+  </div>
+</section>
+
+<div class="modal-backdrop-custom" *ngIf="isFormOpen()" (click)="closeForm()">
+  <section class="mission-modal" role="dialog" aria-modal="true" aria-labelledby="mission-form-title" (click)="$event.stopPropagation()">
+    <header class="modal-heading">
+      <div>
+        <h3 id="mission-form-title">{{ editingMissionId() ? 'Modifier la mission' : 'Planifier une mission' }}</h3>
+        <p>{{ editingMissionId() ? 'La modification est disponible tant que le chauffeur n’a pas démarré.' : 'Choisissez les ressources et la période prévue.' }}</p>
+      </div>
+      <button class="btn-close" type="button" aria-label="Fermer" (click)="closeForm()"></button>
+    </header>
+
+    <form (ngSubmit)="submit()">
+      <div *ngIf="error()" class="alert alert-danger" role="alert">{{ error() }}</div>
+      <div class="form-grid">
+        <label>Véhicule
+          <select class="form-select" [ngModel]="form().vehiculeId || ''" (ngModelChange)="setFormValue('vehiculeId', $event)" name="vehiculeId" required>
+            <option value="" disabled>Choisir un véhicule</option>
+            <option *ngFor="let vehicule of options().vehicules" [value]="vehicule.id">
+              {{ vehicule.marque }} {{ vehicule.modele }} · {{ vehicule.immatriculation }}{{ vehicule.statut === 'en_mission' ? ' (en mission)' : '' }}
+            </option>
+          </select>
+        </label>
+        <label>Chauffeur
+          <select class="form-select" [ngModel]="form().chauffeurId || ''" (ngModelChange)="setFormValue('chauffeurId', $event)" name="chauffeurId" required>
+            <option value="" disabled>Choisir un chauffeur</option>
+            <option *ngFor="let chauffeur of options().chauffeurs" [value]="chauffeur.id">
+              {{ chauffeur.prenom }} {{ chauffeur.nom }}{{ chauffeur.disponible ? '' : ' (en mission)' }}
+            </option>
+          </select>
+        </label>
+        <label>Point de départ
+          <input class="form-control" [ngModel]="form().pointDepart" (ngModelChange)="setFormValue('pointDepart', $event)" name="pointDepart" maxlength="200" required>
+        </label>
+        <label>Point d’arrivée
+          <input class="form-control" [ngModel]="form().pointArrivee" (ngModelChange)="setFormValue('pointArrivee', $event)" name="pointArrivee" maxlength="200" required>
+        </label>
+        <label>Début prévu
+          <input class="form-control" type="datetime-local" [ngModel]="form().datePrevueDebut" (ngModelChange)="setFormValue('datePrevueDebut', $event)" name="datePrevueDebut" required>
+        </label>
+        <label>Fin prévue
+          <input class="form-control" type="datetime-local" [ngModel]="form().datePrevueFin" (ngModelChange)="setFormValue('datePrevueFin', $event)" name="datePrevueFin" required>
+        </label>
+      </div>
+      <footer class="modal-actions">
+        <button type="button" class="btn btn-outline-secondary" (click)="closeForm()">Fermer</button>
+        <button type="submit" class="btn btn-primary">{{ editingMissionId() ? 'Enregistrer les modifications' : 'Créer la mission' }}</button>
+      </footer>
+    </form>
+  </section>
+</div>

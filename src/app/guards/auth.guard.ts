@@ -15,5 +15,10 @@ export const authGuard: CanActivateFn = (route) => {
     return router.createUrlTree(['/dashboard']);
   }
 
+  const excludedTypes = route.data?.['excludedTypes'] as string[] | undefined;
+  if (excludedTypes?.includes(auth.currentUser()?.typeUtilisateur ?? '')) {
+    return router.createUrlTree(['/missions']);
+  }
+
   return true;
 };

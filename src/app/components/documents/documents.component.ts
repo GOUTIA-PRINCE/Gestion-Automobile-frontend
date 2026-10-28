@@ -29,12 +29,44 @@ export class DocumentsComponent {
   searchQuery = this.documentService.searchQuery;
   isLoading = signal(false);
   isUploadOpen = signal(false);
+  selectedFolder = signal<number | 'other' | null>(null);
   vehicules = signal<Vehicules[]>([]);
   chauffeurs = signal<Chauffeur[]>([]);
   formData: Partial<Document> & { tagsText?: string } = this.createEmptyForm();
 
   // Computed
-  filteredDocuments = computed(() => this.documentService.getFilteredDocuments());
+  documentsFiltrees = computed(() => this.documentService.getFilteredDocuments());
+  filteredDocuments = computed(() => {
+    const folder = this.selectedFolder();
+    const documents = this.documentsFiltrees();
+    if (folder === null) return documents;
+    if (folder === 'other') {
+      const vehicleIds = new Set(this.vehicules().map(vehicle => vehicle.id));
+      return documents.filter(document => !document.vehiculeId || !vehicleIds.has(document.vehiculeId));
+    }
+    return documents.filter(document => document.vehiculeId === folder);
+  });
+  vehicleFolders = computed(() => {
+    const documents = this.documentsFiltrees();
+    return this.vehicules().map(vehicle => ({
+      vehicle,
+      count: documents.filter(document => document.vehiculeId === vehicle.id).length
+    }));
+  });
+  otherDocumentsCount = computed(() => {
+    const vehicleIds = new Set(this.vehicules().map(vehicle => vehicle.id));
+    return this.documentsFiltrees().filter(document =>
+      !document.vehiculeId || !vehicleIds.has(document.vehiculeId)
+    ).length;
+  });
+  selectedFolderTitle = computed(() => {
+    const folder = this.selectedFolder();
+    if (folder === 'other') return 'Autres documents';
+    const vehicle = this.vehicules().find(item => item.id === folder);
+    return vehicle
+      ? `${vehicle.marque} ${vehicle.modele} · ${vehicle.immatriculation}`
+      : 'Documents du véhicule';
+  });
   stats = computed(() => this.documentService.getStats());
   typesOptions = computed(() => this.documentService.getTypes());
   categoriesOptions = computed(() => this.documentService.getCategories());
@@ -72,8 +104,24 @@ export class DocumentsComponent {
 
   // ... le reste de votre code reste inchangé
   handleUpload(): void {
-    this.formData = this.createEmptyForm();
+    const folder = this.selectedFolder();
+    this.formData = {
+      ...this.createEmptyForm(),
+      ...(typeof folder === 'number' ? { vehiculeId: folder, categorie: 'vehicule' as const } : {})
+    };
     this.isUploadOpen.set(true);
+  }
+
+  openVehicleFolder(vehicleId: number): void {
+    this.selectedFolder.set(vehicleId);
+  }
+
+  openOtherFolder(): void {
+    this.selectedFolder.set('other');
+  }
+
+  backToFolders(): void {
+    this.selectedFolder.set(null);
   }
 
   handleSubmit(): void {

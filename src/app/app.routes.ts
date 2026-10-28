@@ -15,7 +15,8 @@ import { authGuard } from './guards/auth.guard';
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard], data: { permissions: ['dashboard:read'] } },
-  { path: 'vehicules', component: VehiculesComponent, canActivate: [authGuard], data: { permissions: ['vehicules:read'] } },
+  { path: 'missions', loadComponent: () => import('./components/missions/missions.component').then(module => module.MissionsComponent), canActivate: [authGuard], data: { permissions: ['missions:read'] } },
+  { path: 'vehicules', component: VehiculesComponent, canActivate: [authGuard], data: { permissions: ['vehicules:read'], excludedTypes: ['CHAUFFEUR'] } },
   { path: 'chauffeurs', component: ChauffeursComponent, canActivate: [authGuard], data: { permissions: ['chauffeurs:read'] } },
   { path: 'carburant', component: CarburantComponent, canActivate: [authGuard], data: { permissions: ['carburant:read'] } },
   { path: 'maintenance', component: MaintenanceComponent, canActivate: [authGuard], data: { permissions: ['maintenance:read'] } },

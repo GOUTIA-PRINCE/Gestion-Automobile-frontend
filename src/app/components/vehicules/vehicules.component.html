@@ -136,13 +136,15 @@
             class="badge px-3 py-2 fw-semibold"
             [ngClass]="{
               'bg-success': v.statut === 'actif',
+              'bg-primary': v.statut === 'en_mission',
               'bg-info text-dark': v.statut === 'maintenance_planifiee',
               'bg-warning text-dark': v.statut === 'en_maintenance',
               'bg-danger': v.statut === 'en_panne',
               'bg-secondary': v.statut === 'retire'
             }"
           >
-            {{ v.statut === 'actif' ? 'Actif' : 
+            {{ v.statut === 'actif' ? 'Actif' :
+              v.statut === 'en_mission' ? 'En mission' :
                v.statut === 'maintenance_planifiee' ? 'Maintenance planifiee' :
                v.statut === 'en_maintenance' ? 'En maintenance' : 
                v.statut === 'en_panne' ? 'En panne' : 

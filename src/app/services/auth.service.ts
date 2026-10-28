@@ -53,7 +53,21 @@ export class AuthService {
   }
 
   hasPermission(permission: string): boolean {
-    return this.currentUser()?.permissions?.includes(permission) ?? false;
+    const user = this.currentUser();
+    if (!user) return false;
+    if (user.permissions?.includes(permission)) return true;
+
+    if (permission === 'missions:read' || permission === 'missions:write') {
+      if (user.typeUtilisateur === 'CHAUFFEUR') {
+        return user.permissions?.includes('vehicules:read') ?? false;
+      }
+      if (user.typeUtilisateur !== 'ADMINISTRATEUR' && user.typeUtilisateur !== 'GESTIONNAIRE') {
+        return false;
+      }
+      const legacyPermission = permission.endsWith(':read') ? 'vehicules:read' : 'vehicules:write';
+      return user.permissions?.includes(legacyPermission) ?? false;
+    }
+    return false;
   }
 
   hasAnyPermission(permissions: string[]): boolean {

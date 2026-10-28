@@ -52,7 +52,7 @@
         <div class="card-body p-4 text-center">
           <div class="text-muted small mb-1">Valides</div>
           <div class="h2 fw-bold text-success">{{ stats().valides }}</div>
-          <div class="small text-success">{{ (stats().valides / stats().total * 100).toFixed(0) }}%</div>
+          <div class="small text-success">{{ stats().total ? (stats().valides / stats().total * 100).toFixed(0) : 0 }}%</div>
         </div>
       </div>
     </div>
@@ -135,13 +135,54 @@
     </div>
   </div>
 
+  <section *ngIf="selectedFolder() === null" class="document-folders">
+    <div class="folder-section-heading">
+      <div>
+        <h5 class="mb-1 fw-bold">Dossiers des véhicules</h5>
+        <p class="text-muted mb-0">Ouvrez un dossier pour consulter les documents associés.</p>
+      </div>
+      <span class="text-muted small">{{ vehicleFolders().length }} véhicule(s)</span>
+    </div>
+
+    <div class="folder-grid">
+      <button *ngFor="let folder of vehicleFolders()" type="button" class="vehicle-folder"
+              (click)="openVehicleFolder(folder.vehicle.id)">
+        <span class="folder-icon"><i class="bi bi-folder2-open"></i></span>
+        <span class="folder-content">
+          <strong>{{ folder.vehicle.marque }} {{ folder.vehicle.modele }}</strong>
+          <span>{{ folder.vehicle.immatriculation }}</span>
+          <small>{{ folder.count }} document(s)</small>
+        </span>
+        <i class="bi bi-chevron-right folder-chevron" aria-hidden="true"></i>
+      </button>
+
+      <button type="button" class="vehicle-folder other-folder" (click)="openOtherFolder()">
+        <span class="folder-icon"><i class="bi bi-folder"></i></span>
+        <span class="folder-content">
+          <strong>Autres documents</strong>
+          <span>Chauffeurs, administratif et financier</span>
+          <small>{{ otherDocumentsCount() }} document(s)</small>
+        </span>
+        <i class="bi bi-chevron-right folder-chevron" aria-hidden="true"></i>
+      </button>
+    </div>
+  </section>
+
+  <div *ngIf="selectedFolder() !== null" class="folder-breadcrumb">
+    <button type="button" class="btn btn-link p-0 text-decoration-none" (click)="backToFolders()">
+      <i class="bi bi-arrow-left me-2"></i>Dossiers des véhicules
+    </button>
+    <span class="text-muted">/</span>
+    <strong>{{ selectedFolderTitle() }}</strong>
+  </div>
+
   <!-- CONTENU PRINCIPAL -->
-  <div class="row g-4">
+  <div *ngIf="selectedFolder() !== null" class="row g-4">
     <!-- LISTE DES DOCUMENTS -->
     <div class="col-12 col-lg-8">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-header bg-transparent border-0 py-3 d-flex justify-content-between align-items-center">
-          <h5 class="mb-0 fw-bold">Documents</h5>
+          <h5 class="mb-0 fw-bold">{{ selectedFolderTitle() }}</h5>
           <span class="badge bg-primary">{{ filteredDocuments().length }} document(s)</span>
         </div>
 

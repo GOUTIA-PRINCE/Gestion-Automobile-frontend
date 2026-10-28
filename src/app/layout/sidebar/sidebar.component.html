@@ -11,9 +11,16 @@
       </a>
     </li>
 
-    <li class="nav-item" *ngIf="can('vehicules:read')">
+    <li class="nav-item" *ngIf="can('vehicules:read') && auth.currentUser()?.typeUtilisateur !== 'CHAUFFEUR'">
       <a routerLink="/vehicules" routerLinkActive="active" class="nav-link">
         <i class="bi bi-car-front me-2"></i> Vehicules
+      </a>
+    </li>
+
+    <li class="nav-item" *ngIf="can('missions:read')">
+      <a routerLink="/missions" routerLinkActive="active" class="nav-link">
+        <i class="bi bi-signpost-2 me-2"></i>
+        {{ auth.currentUser()?.typeUtilisateur === 'CHAUFFEUR' ? 'Mes missions' : 'Missions' }}
       </a>
     </li>
 

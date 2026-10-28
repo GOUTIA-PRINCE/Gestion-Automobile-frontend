@@ -48,9 +48,9 @@ export class ChauffeurService {
     total: this.chauffeurs().length,
     actifs: this.chauffeurs().filter(c => c.statut === 'ACTIF').length,
     inactifs: this.chauffeurs().filter(c => c.statut !== 'ACTIF').length,
-    mission: this.chauffeurs().filter(c => c.statut === 'MISSION').length,
-    conge: this.chauffeurs().filter(c => c.statut === 'EN_CONGE').length,
-    disponibles: this.chauffeurs().filter(c => c.disponible).length,
+    mission: this.chauffeurs().filter(c => c.statutOperationnel === 'MISSION').length,
+    conge: this.chauffeurs().filter(c => c.statutOperationnel === 'EN_CONGE').length,
+    disponibles: this.chauffeurs().filter(c => c.statutOperationnel === 'ACTIF' && c.disponible).length,
   }));
 
   // ─── Opérations READ ───────────────────────────────────────────────────

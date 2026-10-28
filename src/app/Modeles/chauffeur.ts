@@ -11,6 +11,7 @@ export interface Chauffeur {
   telephone: string;
   password?: string; // optionnel en lecture
   statut: string; // 'ACTIF' | 'INACTIF'
+  statutOperationnel?: 'ACTIF' | 'INACTIF' | 'MISSION' | 'INDISPONIBLE' | 'EN_CONGE';
   dateCreation: string;
   derniereConnexion?: string;
   adresse?: string;
