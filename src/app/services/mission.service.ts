@@ -5,7 +5,7 @@ import { Mission, MissionOptions, PlanifierMission } from '../Modeles/mission';
 @Injectable({ providedIn: 'root' })
 export class MissionService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/missions';
+  private readonly apiUrl = '/api/missions';
 
   getAll() {
     return this.http.get<Mission[]>(this.apiUrl);

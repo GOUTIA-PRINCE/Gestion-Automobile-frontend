@@ -6,7 +6,7 @@ import { Parametre } from '../Modeles/parametre';
   providedIn: 'root'
 })
 export class ParametreService {
-  private readonly apiUrl = 'http://localhost:8080/api/parametres';
+  private readonly apiUrl = '/api/parametres';
 
   parametres = signal<Parametre[]>([]);
   searchQuery = signal('');

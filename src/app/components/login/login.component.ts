@@ -17,15 +17,10 @@ export class LoginComponent {
 
   email = '';
   password = '';
-  resetEmail = '';
-  newPassword = '';
   showPassword = signal(false);
-  showNewPassword = signal(false);
   isResetOpen = signal(false);
   isLoading = signal(false);
-  isResetLoading = signal(false);
   error = signal<string | null>(null);
-  resetMessage = signal<string | null>(null);
 
   login(): void {
     if (!this.email || !this.password) {
@@ -48,30 +43,6 @@ export class LoginComponent {
   }
 
   openReset(): void {
-    this.resetEmail = this.email;
-    this.newPassword = '';
-    this.resetMessage.set(null);
     this.isResetOpen.set(true);
-  }
-
-  resetPassword(): void {
-    if (!this.resetEmail || !this.newPassword) {
-      this.resetMessage.set('Email et nouveau mot de passe requis');
-      return;
-    }
-
-    this.isResetLoading.set(true);
-    this.resetMessage.set(null);
-    this.authService.resetPassword(this.resetEmail.trim(), this.newPassword).subscribe({
-      next: () => {
-        this.resetMessage.set('Mot de passe reinitialise. Vous pouvez vous connecter.');
-        this.password = this.newPassword;
-        this.isResetLoading.set(false);
-      },
-      error: err => {
-        this.resetMessage.set(err?.error?.message || err?.message || 'Reinitialisation impossible');
-        this.isResetLoading.set(false);
-      }
-    });
   }
 }

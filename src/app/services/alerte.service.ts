@@ -6,7 +6,7 @@ import { Alerte } from '../Modeles/alerte';
   providedIn: 'root'
 })
 export class AlerteService {
-  private readonly apiUrl = 'http://localhost:8080/api/alertes';
+  private readonly apiUrl = '/api/alertes';
 
   alertes = signal<Alerte[]>([]);
   filtreType = signal<string>('tous');

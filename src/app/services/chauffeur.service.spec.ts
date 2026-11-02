@@ -6,7 +6,7 @@ import { Chauffeur } from '../Modeles/chauffeur';
 describe('ChauffeurService', () => {
   let service: ChauffeurService;
   let httpMock: HttpTestingController;
-  const apiUrl = 'http://localhost:8080/api/chauffeurs';
+  const apiUrl = '/api/chauffeurs';
 
   // Données de test
   const mockChauffeur: Chauffeur = {

@@ -6,7 +6,7 @@ import { Plein, StatCarburant, EvolutionMensuelle } from '../Modeles/carburant';
   providedIn: 'root'
 })
 export class CarburantService {
-  private readonly apiUrl = 'http://localhost:8080/api/carburants';
+  private readonly apiUrl = '/api/carburants';
 
   pleins = signal<Plein[]>([]);
   evolutionMensuelle = signal<EvolutionMensuelle[]>([]);
