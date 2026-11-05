@@ -1,5 +1,6 @@
 .login-page {
   min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
   place-items: center;
   background:
@@ -112,9 +113,10 @@
   }
 
   .login-hero {
+    width: min(430px, 100%);
     min-height: auto;
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 20px;
   }
 
   .hero-copy h1 {
@@ -128,14 +130,51 @@
 
 @media (max-width: 520px) {
   .login-page {
-    padding: 18px;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    align-items: start;
+    padding: max(14px, env(safe-area-inset-top)) 14px max(20px, env(safe-area-inset-bottom));
   }
 
-  .hero-copy h1 {
-    font-size: 28px;
+  .login-hero {
+    gap: 14px;
   }
 
   .login-panel {
-    padding: 24px;
+    padding: 20px;
+  }
+
+  .brand {
+    margin-bottom: 20px;
+  }
+
+  .brand h2 {
+    font-size: 24px;
+  }
+
+  .brand-mark {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 12px;
+    font-size: 22px;
+  }
+
+  .eyebrow {
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+
+  .hero-copy h1 {
+    font-size: 23px;
+    line-height: 1.16;
+  }
+
+  .hero-text {
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.45;
   }
 }
