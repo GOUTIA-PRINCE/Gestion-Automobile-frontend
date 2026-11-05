@@ -48,6 +48,16 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
+  handleUnauthorized(): void {
+    this.storage()?.removeItem(this.tokenKey);
+    this.storage()?.removeItem(this.userKey);
+    this.token.set(null);
+    this.currentUser.set(null);
+    if (this.router.url !== '/login') {
+      void this.router.navigate(['/login']);
+    }
+  }
+
   hasPermission(permission: string): boolean {
     const user = this.currentUser();
     if (!user) return false;
